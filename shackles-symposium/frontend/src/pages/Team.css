@@ -1,0 +1,708 @@
+.team {
+  min-height: 100vh;
+}
+
+.team-hero {
+  padding: 6rem 2rem 4rem;
+  text-align: center;
+  background: linear-gradient(135deg, #1a0a14 0%, #000000 50%, #0a1a14 100%);
+}
+
+.team-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  color: var(--guard-pink);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 30px rgba(227, 27, 108, 0.6);
+}
+
+.team-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  color: var(--player-green);
+  letter-spacing: 2px;
+  margin-bottom: 0.5rem;
+}
+
+.team-desc {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.team-section {
+  padding: 4rem 2rem;
+}
+
+.faculty-section {
+  background: #000000;
+}
+
+.staff-section {
+  background: #000000;
+}
+
+.office-bearers-section {
+  background: linear-gradient(180deg, #000000 0%, #1a0a14 100%);
+}
+
+.executives-section {
+  background: #000000;
+}
+
+.coordinators-section {
+  background: linear-gradient(180deg, #000000 0%, #0a1a14 100%);
+}
+
+.core-section {
+  background: linear-gradient(180deg, #000000 0%, #1a0a14 100%);
+}
+
+.technical-section {
+  background: #000000;
+}
+
+.non-technical-section {
+  background: linear-gradient(180deg, #000000 0%, #0a1a14 100%);
+}
+
+.logistics-section {
+  background: #000000;
+}
+
+.section-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.section-symbol {
+  font-size: 4rem;
+  font-weight: 700;
+}
+
+.technical-section .section-symbol {
+  color: var(--guard-pink);
+}
+
+.non-technical-section .section-symbol {
+  color: var(--player-green);
+}
+
+.section-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.faculty-section .section-title {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.staff-section .section-title {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.office-bearers-section .section-title {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.executives-section .section-title {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.coordinators-section .section-title {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.core-section .section-title {
+  color: var(--player-green);
+  text-shadow: 0 0 20px rgba(10, 215, 161, 0.5);
+}
+
+.technical-section .section-title {
+  color: var(--guard-pink);
+  text-shadow: 0 0 20px rgba(227, 27, 108, 0.5);
+}
+
+.non-technical-section .section-title {
+  color: var(--player-green);
+  text-shadow: 0 0 20px rgba(10, 215, 161, 0.5);
+}
+
+.logistics-section .section-title {
+  color: var(--accent-blue);
+  text-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
+}
+
+.faculty-grid {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  max-width: 900px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.staff-grid {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  max-width: 900px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.faculty-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
+  padding: 3rem 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  flex: 0 1 350px;
+}
+
+.staff-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
+  padding: 3rem 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  flex: 0 1 350px;
+}
+
+.faculty-card:hover,
+.staff-card:hover {
+  transform: translateY(-10px);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 15px 50px rgba(255, 255, 255, 0.3);
+}
+
+.faculty-avatar,
+.staff-avatar {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-icon {
+  font-size: 4rem;
+  filter: grayscale(100%) brightness(200%);
+}
+
+.faculty-name,
+.staff-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.8rem;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 0.8rem;
+}
+
+.faculty-designation,
+.staff-designation {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.faculty-department,
+.staff-department {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.05rem;
+}
+
+/* Office Bearers Grid - 4 columns (12 cards = 3 rows) */
+.office-bearers-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.office-bearers-grid .member-card {
+  min-width: 0;
+  width: 100%;
+}
+
+/* Executives Grid - 5 columns (10 cards = 2 rows) */
+.executives-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.executives-grid .member-card {
+  min-width: 0;
+  width: 100%;
+}
+
+/* Executives specific styling for better text handling */
+.executive-card .member-name {
+  font-size: clamp(1rem, 1.5vw, 1.3rem);
+  letter-spacing: -0.5px;
+  line-height: 1.25;
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Coordinators Grid - 4 columns (12 cards = 3 rows) */
+.coordinators-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.coordinators-grid .member-card {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Force 4 columns on all desktop screens */
+@media (min-width: 992px) {
+  .coordinators-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 2rem;
+  }
+}
+
+.core-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 3rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2.5rem;
+}
+
+.member-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.member-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.office-bearer-card,
+.executive-card,
+.coordinator-card {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+}
+
+.core-card {
+  border-width: 3px;
+}
+
+.technical-card {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+}
+
+.technical-card:hover {
+  box-shadow: 0 15px 40px rgba(227, 27, 108, 0.3);
+}
+
+.non-technical-card {
+  border-color: var(--player-green);
+}
+
+.logistics-card {
+  border-color: var(--accent-blue);
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+}
+
+.logistics-card:hover {
+  box-shadow: 0 15px 40px rgba(52, 152, 219, 0.3);
+}
+
+.member-avatar {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.staff-avatar-img,
+.member-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.core-card .member-avatar {
+  background: rgba(255, 255, 255, 0.1);
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  width: 110px;
+  height: 110px;
+  font-size: 3rem;
+}
+
+.technical-card .member-avatar,
+.non-technical-card .member-avatar,
+.logistics-card .member-avatar,
+.office-bearer-card .member-avatar,
+.executive-card .member-avatar,
+.coordinator-card .member-avatar {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.member-card:hover .member-avatar {
+  transform: scale(1.1);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.avatar-text {
+  text-transform: uppercase;
+}
+
+.member-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+  line-height: 1.3;
+  min-height: 2.6rem;
+}
+
+.member-designation,
+.member-role {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  min-height: 3rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+.core-card .member-designation {
+  color: var(--player-green);
+  font-weight: 600;
+}
+
+.member-phone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: rgba(10, 215, 161, 0.1);
+  border: 2px solid var(--player-green);
+  border-radius: 50px;
+  color: var(--player-green);
+  text-decoration: none;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  margin-top: auto;
+}
+
+.technical-card .member-phone {
+  border-color: var(--guard-pink);
+  color: var(--guard-pink);
+  background: rgba(227, 27, 108, 0.1);
+}
+
+.logistics-card .member-phone {
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  background: rgba(52, 152, 219, 0.1);
+}
+
+.member-phone:hover {
+  background: var(--player-green);
+  color: var(--bg-primary);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(10, 215, 161, 0.4);
+}
+
+.technical-card .member-phone:hover {
+  background: var(--guard-pink);
+  color: white;
+  box-shadow: 0 5px 15px rgba(227, 27, 108, 0.4);
+}
+
+.logistics-card .member-phone:hover {
+  background: var(--accent-blue);
+  color: white;
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+}
+
+.phone-icon {
+  font-size: 1.2rem;
+}
+
+.member-linkedin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: transparent;
+  border: 2px solid var(--accent-blue);
+  border-radius: 50px;
+  color: var(--accent-blue);
+  text-decoration: none;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.member-linkedin:hover {
+  background: var(--accent-blue);
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+}
+
+.about-mea {
+  padding: 5rem 2rem;
+  background: linear-gradient(135deg, #1a0a14 0%, #000000 50%, #0a1a14 100%);
+}
+
+.about-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.about-container h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--player-green);
+  text-align: center;
+  margin-bottom: 2.5rem;
+  text-shadow: 0 0 20px rgba(10, 215, 161, 0.5);
+}
+
+.about-desc {
+  color: var(--text-secondary);
+  font-size: 1.15rem;
+  line-height: 1.9;
+  margin-bottom: 2rem;
+  text-align: justify;
+}
+
+.mea-values {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.value-card {
+  background: linear-gradient(135deg, rgba(10, 215, 161, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+  border: 2px solid var(--player-green);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.value-card:hover {
+  transform: translateY(-10px);
+  border-color: var(--guard-pink);
+  box-shadow: 0 10px 40px rgba(10, 215, 161, 0.3);
+}
+
+.value-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1.5rem;
+}
+
+.value-card h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.5rem;
+  color: var(--player-green);
+  margin-bottom: 1rem;
+}
+
+.value-card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.team-cta {
+  padding: 5rem 2rem;
+  text-align: center;
+  background: #000000;
+}
+
+.team-cta h2 {
+  font-family: 'GameOfSquids', sans-serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: var(--guard-pink);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 20px rgba(227, 27, 108, 0.6);
+}
+
+.team-cta p {
+  font-size: 1.3rem;
+  color: var(--text-secondary);
+  margin-bottom: 3rem;
+}
+
+.btn-register-team {
+  display: inline-block;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  padding: 1.2rem 3.5rem;
+  background: var(--player-green);
+  color: var(--bg-primary);
+  border: 2px solid var(--player-green);
+  border-radius: 50px;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 30px rgba(10, 215, 161, 0.4);
+}
+
+.btn-register-team:hover {
+  background: transparent;
+  color: var(--player-green);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 40px rgba(10, 215, 161, 0.6);
+}
+
+/* Tablet view - maintain 3 or 2 columns for coordinators */
+@media (min-width: 769px) and (max-width: 991px) {
+  .coordinators-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 1.5rem;
+  }
+  
+  .office-bearers-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .executives-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .executive-card .member-name {
+    font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+  }
+  
+  .member-name {
+    font-size: clamp(1rem, 2.2vw, 1.3rem);
+  }
+}
+
+@media (max-width: 768px) {
+  .faculty-grid,
+  .staff-grid {
+    flex-direction: column;
+  }
+
+  .faculty-card,
+  .staff-card {
+    flex: 1 1 100%;
+  }
+
+  .office-bearers-grid,
+  .executives-grid,
+  .coordinators-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .core-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .member-name {
+    font-size: 1.4rem;
+    line-height: 1.3;
+    min-height: unset;
+  }
+  
+  .executive-card .member-name {
+    font-size: 1.3rem;
+  }
+
+  .mea-values {
+    grid-template-columns: 1fr;
+  }
+
+  .section-header {
+    flex-direction: column;
+  }
+}
