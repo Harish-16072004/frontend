@@ -61,14 +61,48 @@ const RegistrationSchema = new mongoose.Schema({
     ref: 'Payment',
     default: null
   },
-  status: {
+  // Payment Screenshot Upload (NEW)
+  paymentScreenshot: {
     type: String,
-    enum: ['pending', 'confirmed', 'cancelled', 'attended'],
+    default: null  // S3 URL of uploaded payment proof
+  },
+  transactionId: {
+    type: String,
+    default: null,
+    trim: true
+  },
+  // Payment Verification (NEW)
+  verificationStatus: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
     default: 'pending'
   },
-  qrCode: {
+  verifiedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  verifiedAt: {
+    type: Date,
+    default: null
+  },
+  rejectionReason: {
     type: String,
     default: null
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'confirmed', 'attended'],
+    default: 'pending'
+  },
+  // QR Code (Generated after payment approval)
+  qrCode: {
+    type: String,
+    default: null  // S3 URL of generated QR code
+  },
+  qrCodeData: {
+    type: String,
+    default: null  // Encoded data in QR code
   },
   checkInTime: {
     type: Date,
@@ -82,13 +116,7 @@ const RegistrationSchema = new mongoose.Schema({
   notes: {
     type: String,
     maxlength: 500
-  },
-  cancelledAt: Date,
-  cancelledBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
-  cancellationReason: String
+  }
 }, {
   timestamps: true
 });
@@ -114,35 +142,6 @@ RegistrationSchema.pre('save', async function(next) {
   }
 });
 
-// Check if registration can be cancelled
-RegistrationSchema.methods.canCancel = function() {
-  if (this.status === 'cancelled' || this.status === 'attended') {
-    return false;
-  }
-  
-  // Can't cancel if checked in
-  if (this.checkInTime) {
-    return false;
-  }
-  
-  // Can't cancel if less than 24 hours before event
-  let eventDate;
-  if (this.event && this.event.date) {
-    eventDate = this.event.date;
-  } else if (this.workshop && this.workshop.schedule && this.workshop.schedule[0]) {
-    eventDate = this.workshop.schedule[0].date;
-  }
-  
-  if (eventDate) {
-    const hoursUntilEvent = (eventDate - new Date()) / (1000 * 60 * 60);
-    if (hoursUntilEvent < 24) {
-      return false;
-    }
-  }
-  
-  return true;
-};
-
 // Mark as attended
 RegistrationSchema.methods.markAttended = async function(checkedInBy) {
   this.status = 'attended';
@@ -151,23 +150,10 @@ RegistrationSchema.methods.markAttended = async function(checkedInBy) {
   await this.save();
 };
 
-// Cancel registration
-RegistrationSchema.methods.cancel = async function(cancelledBy, reason) {
-  if (!this.canCancel()) {
-    throw new Error('Registration cannot be cancelled');
-  }
-  
-  this.status = 'cancelled';
-  this.cancelledAt = new Date();
-  this.cancelledBy = cancelledBy;
-  this.cancellationReason = reason;
-  await this.save();
-};
-
 // Indexes
 RegistrationSchema.index({ user: 1, event: 1 });
 RegistrationSchema.index({ user: 1, workshop: 1 });
-RegistrationSchema.index({ registrationNumber: 1 });
+// registrationNumber index is automatically created by unique: true
 RegistrationSchema.index({ paymentStatus: 1, status: 1 });
 
 module.exports = mongoose.model('Registration', RegistrationSchema);

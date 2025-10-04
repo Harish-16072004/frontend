@@ -2,9 +2,11 @@ const User = require('../models/User');
 const Event = require('../models/Event');
 const Registration = require('../models/Registration');
 const Payment = require('../models/Payment');
-const exportToExcel = require('../utils/excelGenerator');
-const exportToGoogleSheets = require('../utils/googleSheets');
-const sendEmail = require('../utils/emailService');
+const { exportToExcel } = require('../utils/excelGenerator');
+const { exportToGoogleSheets } = require('../utils/googleSheets');
+const { sendEmail } = require('../utils/emailService');
+const { generateQR } = require('../utils/qrGenerator');
+const { uploadToS3 } = require('../utils/s3Upload');
 
 // @desc    Get dashboard statistics
 // @route   GET /api/v1/admin/dashboard
@@ -385,6 +387,35 @@ exports.sendBulkEmail = async (req, res) => {
     res.status(200).json({
       success: true,
       message: `Bulk email sent to ${users.length} recipients`
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+
+// @desc    Get pending payment verifications
+// @route   GET /api/v1/admin/registrations/pending-verification
+// @access  Private/Admin
+exports.getPendingVerifications = async (req, res) => {
+  try {
+    const pendingRegistrations = await Registration.find({
+      verificationStatus: 'pending',
+      paymentScreenshot: { $ne: null }
+    })
+      .populate('user', 'name email phone college department year')
+      .populate('event', 'name category fees')
+      .populate('workshop', 'title fees')
+      .sort('-createdAt');
+
+    res.status(200).json({
+      success: true,
+      count: pendingRegistrations.length,
+      data: pendingRegistrations
     });
 
   } catch (error) {

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import Loader from '../../components/common/Loader';
 import QRCode from 'qrcode.react';
-import './Profile.css';
+import '../../styles/Profile.css';
 
 const Profile = () => {
   const { user, logout } = useAuth();

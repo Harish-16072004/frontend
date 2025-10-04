@@ -11,6 +11,10 @@ const {
   sendBulkEmail,
   getAnalytics
 } = require('../controllers/adminController');
+const {
+  getPendingVerifications,
+  verifyPayment
+} = require('../controllers/paymentVerificationController');
 const { protect, authorize } = require('../middleware/auth');
 
 // All routes require admin authorization
@@ -26,6 +30,10 @@ router.get('/users', getAllUsers);
 
 // Registration management
 router.get('/registrations', getAllRegistrations);
+
+// Payment Verification (NEW)
+router.get('/registrations/pending-verification', getPendingVerifications);
+router.put('/registrations/:id/verify', verifyPayment);
 
 // Payment management
 router.get('/payments', getAllPayments);

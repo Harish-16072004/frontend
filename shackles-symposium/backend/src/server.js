@@ -8,8 +8,8 @@ const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
 const colors = require('colors');
 const connectDB = require('./config/database');
-const errorHandler = require('./middleware/errorHandler');
-const rateLimiter = require('./middleware/rateLimiter');
+const { errorHandler } = require('./middleware/errorHandler');
+const { apiLimiter } = require('./middleware/rateLimiter');
 
 // Load env vars
 dotenv.config();
@@ -49,7 +49,7 @@ app.use(mongoSanitize());
 app.use(compression());
 
 // Apply rate limiting to API routes
-app.use('/api/', rateLimiter);
+app.use('/api/', apiLimiter);
 
 // Health check route
 app.get('/health', (req, res) => {

@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const crypto = require('crypto');
-const sendEmail = require('../utils/emailService');
+const { sendEmail } = require('../utils/emailService');
 
 // @desc    Register user
 // @route   POST /api/v1/auth/register

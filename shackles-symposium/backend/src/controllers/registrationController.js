@@ -1,8 +1,9 @@
 const Registration = require('../models/Registration');
 const Event = require('../models/Event');
 const Workshop = require('../models/Workshop');
-const generateQR = require('../utils/qrGenerator');
-const generatePDF = require('../utils/pdfGenerator');
+const { generateQR } = require('../utils/qrGenerator');
+const { generateTicketPDF: generatePDF } = require('../utils/pdfGenerator');
+const { uploadToS3 } = require('../utils/s3Upload');
 
 // @desc    Create new registration
 // @route   POST /api/v1/registrations
@@ -73,6 +74,112 @@ exports.createRegistration = async (req, res) => {
       data: registration
     });
   } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// @desc    Create new registration with payment screenshot
+// @route   POST /api/v1/registrations/with-payment
+// @access  Private
+exports.createRegistrationWithPayment = async (req, res) => {
+  try {
+    const { eventId, workshopId, teamMembers, teamName, amount, transactionId } = req.body;
+
+    // Check if payment screenshot was uploaded
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please upload payment screenshot'
+      });
+    }
+
+    // Determine registration type
+    let registrationType = eventId ? 'event' : 'workshop';
+    let referenceId = eventId || workshopId;
+
+    // Check if event or workshop exists
+    let event, workshop, registrationAmount;
+    if (eventId) {
+      event = await Event.findById(eventId);
+      if (!event) {
+        return res.status(404).json({
+          success: false,
+          message: 'Event not found'
+        });
+      }
+
+      // Check if seats available
+      if (event.registeredCount >= event.maxParticipants) {
+        return res.status(400).json({
+          success: false,
+          message: 'Event is full'
+        });
+      }
+
+      registrationAmount = event.fees || amount;
+    }
+
+    if (workshopId) {
+      workshop = await Workshop.findById(workshopId);
+      if (!workshop) {
+        return res.status(404).json({
+          success: false,
+          message: 'Workshop not found'
+        });
+      }
+
+      // Check if seats available
+      if (workshop.registeredCount >= workshop.maxParticipants) {
+        return res.status(400).json({
+          success: false,
+          message: 'Workshop is full'
+        });
+      }
+
+      registrationAmount = workshop.fees || amount;
+    }
+
+    // Upload payment screenshot to S3
+    const paymentFolder = process.env.S3_FOLDER_PAYMENT_PROOF || 'payment-proof';
+    const uploadResult = await uploadToS3(req.file, paymentFolder);
+
+    if (!uploadResult.success) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to upload payment screenshot'
+      });
+    }
+
+    // Create registration with payment screenshot
+    const registration = await Registration.create({
+      user: req.user.id,
+      event: eventId || null,
+      workshop: workshopId || null,
+      type: registrationType,
+      teamName: teamName || null,
+      teamMembers: teamMembers || [],
+      amount: registrationAmount,
+      paymentScreenshot: uploadResult.url,
+      transactionId: transactionId || null,
+      paymentStatus: 'pending',
+      verificationStatus: 'pending',
+      status: 'pending'
+    });
+
+    // Populate the registration
+    await registration.populate('event workshop user', 'name email phone college');
+
+    res.status(201).json({
+      success: true,
+      message: 'Registration submitted successfully! Your payment is pending verification. You will receive confirmation once admin approves.',
+      data: registration
+    });
+
+  } catch (error) {
+    console.error('Registration error:', error);
     res.status(400).json({
       success: false,
       message: error.message
@@ -226,52 +333,6 @@ exports.deleteRegistration = async (req, res) => {
       success: true,
       message: 'Registration deleted successfully',
       data: {}
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
-};
-
-// @desc    Cancel registration
-// @route   POST /api/v1/registrations/:id/cancel
-// @access  Private
-exports.cancelRegistration = async (req, res) => {
-  try {
-    const registration = await Registration.findById(req.params.id);
-
-    if (!registration) {
-      return res.status(404).json({
-        success: false,
-        message: 'Registration not found'
-      });
-    }
-
-    // Check if user owns this registration
-    if (registration.user.toString() !== req.user.id && req.user.role !== 'admin') {
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized'
-      });
-    }
-
-    // Check if can be cancelled (e.g., not within 24 hours of event)
-    if (registration.status === 'cancelled') {
-      return res.status(400).json({
-        success: false,
-        message: 'Registration is already cancelled'
-      });
-    }
-
-    registration.status = 'cancelled';
-    await registration.save();
-
-    res.status(200).json({
-      success: true,
-      message: 'Registration cancelled successfully',
-      data: registration
     });
   } catch (error) {
     res.status(500).json({

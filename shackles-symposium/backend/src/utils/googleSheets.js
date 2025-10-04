@@ -3,13 +3,43 @@ const path = require('path');
 
 /**
  * Get Google Sheets API client
+ * Supports two authentication methods:
+ * 1. JSON key file (GOOGLE_APPLICATION_CREDENTIALS env variable)
+ * 2. Environment variables (GOOGLE_CLIENT_EMAIL and GOOGLE_PRIVATE_KEY)
  */
 const getGoogleSheetsClient = async () => {
   try {
-    const auth = new google.auth.GoogleAuth({
-      keyFile: path.join(__dirname, '../../', process.env.GOOGLE_APPLICATION_CREDENTIALS),
-      scopes: ['https://www.googleapis.com/auth/spreadsheets']
-    });
+    let auth;
+
+    // Method 1: Use JSON key file if GOOGLE_APPLICATION_CREDENTIALS is set
+    if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+      auth = new google.auth.GoogleAuth({
+        keyFile: path.join(__dirname, '../../', process.env.GOOGLE_APPLICATION_CREDENTIALS),
+        scopes: ['https://www.googleapis.com/auth/spreadsheets']
+      });
+    } 
+    // Method 2: Use environment variables
+    else if (process.env.GOOGLE_CLIENT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
+      const credentials = {
+        type: 'service_account',
+        client_email: process.env.GOOGLE_CLIENT_EMAIL,
+        private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        project_id: process.env.GOOGLE_PROJECT_ID || 'shackles-symposium'
+      };
+
+      auth = new google.auth.GoogleAuth({
+        credentials,
+        scopes: ['https://www.googleapis.com/auth/spreadsheets']
+      });
+    } 
+    // No credentials found
+    else {
+      throw new Error(
+        'Google Sheets credentials not found. Please set either:\n' +
+        '1. GOOGLE_APPLICATION_CREDENTIALS (path to JSON key file), OR\n' +
+        '2. GOOGLE_CLIENT_EMAIL and GOOGLE_PRIVATE_KEY (from service account)'
+      );
+    }
 
     const authClient = await auth.getClient();
     const sheets = google.sheets({ version: 'v4', auth: authClient });
@@ -17,7 +47,7 @@ const getGoogleSheetsClient = async () => {
     return sheets;
   } catch (error) {
     console.error('Google Sheets auth error:', error);
-    throw new Error('Failed to authenticate with Google Sheets API');
+    throw new Error('Failed to authenticate with Google Sheets API: ' + error.message);
   }
 };
 

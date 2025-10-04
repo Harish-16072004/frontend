@@ -6,13 +6,9 @@ const {
   getPayments,
   getPayment,
   updatePaymentStatus,
-  refundPayment,
-  razorpayWebhook
+  refundPayment
 } = require('../controllers/paymentController');
 const { protect, authorize } = require('../middleware/auth');
-
-// Webhook route (no auth required - Razorpay calls this)
-router.post('/razorpay/webhook', razorpayWebhook);
 
 // Protected routes
 router.use(protect);

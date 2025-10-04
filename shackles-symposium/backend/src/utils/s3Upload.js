@@ -13,10 +13,14 @@ const s3 = new AWS.S3({
  * Upload file to S3
  * @param {Object} file - File object from multer
  * @param {String} folder - Folder name in S3 bucket
+ * @param {String} bucketName - Optional: specific bucket name (defaults to main bucket)
  * @returns {Promise<Object>} Upload result with file URL
  */
-exports.uploadToS3 = async (file, folder = 'uploads') => {
+exports.uploadToS3 = async (file, folder = 'uploads', bucketName = null) => {
   try {
+    // Use specified bucket or default to main bucket
+    const bucket = bucketName || process.env.AWS_S3_BUCKET_NAME;
+    
     // Create unique filename
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 15);
@@ -25,7 +29,7 @@ exports.uploadToS3 = async (file, folder = 'uploads') => {
 
     // Upload parameters
     const params = {
-      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Bucket: bucket,
       Key: fileName,
       Body: file.buffer || fs.createReadStream(file.path),
       ContentType: file.mimetype,

@@ -23,19 +23,8 @@ const PaymentSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['razorpay', 'upi', 'card', 'netbanking', 'wallet', 'cash', 'other'],
-    default: 'razorpay'
-  },
-  razorpayOrderId: {
-    type: String,
-    sparse: true
-  },
-  razorpayPaymentId: {
-    type: String,
-    sparse: true
-  },
-  razorpaySignature: {
-    type: String
+    enum: ['upi', 'card', 'netbanking', 'wallet', 'cash', 'other'],
+    default: 'upi'
   },
   transactionId: {
     type: String,
@@ -161,9 +150,7 @@ PaymentSchema.methods.verify = async function(verifiedBy) {
 // Indexes
 PaymentSchema.index({ user: 1, status: 1 });
 PaymentSchema.index({ registration: 1 });
-PaymentSchema.index({ transactionId: 1 });
-PaymentSchema.index({ razorpayOrderId: 1 });
-PaymentSchema.index({ razorpayPaymentId: 1 });
+// transactionId index is automatically created by unique: true
 PaymentSchema.index({ paymentDate: -1 });
 
 module.exports = mongoose.model('Payment', PaymentSchema);

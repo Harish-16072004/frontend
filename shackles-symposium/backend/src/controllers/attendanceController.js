@@ -1,6 +1,6 @@
 const Attendance = require('../models/Attendance');
 const Registration = require('../models/Registration');
-const exportToExcel = require('../utils/excelGenerator');
+const { exportToExcel } = require('../utils/excelGenerator');
 
 // @desc    Mark attendance
 // @route   POST /api/v1/attendance/mark

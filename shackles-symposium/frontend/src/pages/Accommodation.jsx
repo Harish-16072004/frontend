@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import './Accommodation.css';
+import '../styles/Accommodation.css';
 
 const Accommodation = () => {
   const [needsAccommodation, setNeedsAccommodation] = useState(false);

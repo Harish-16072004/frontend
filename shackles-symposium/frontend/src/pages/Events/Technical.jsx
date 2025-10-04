@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import './Technical.css';
+import '../../styles/Technical.css';
 
 const Technical = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);

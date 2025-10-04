@@ -1,21 +1,14 @@
-const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const Payment = require('../models/Payment');
 const Registration = require('../models/Registration');
-const sendEmail = require('../utils/emailService');
-
-// Initialize Razorpay
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
-});
+const { sendEmail } = require('../utils/emailService');
 
 // @desc    Create payment order
 // @route   POST /api/v1/payments/create-order
 // @access  Private
 exports.createPaymentOrder = async (req, res) => {
   try {
-    const { registrationId } = req.body;
+    const { registrationId, amount, paymentMethod = 'upi' } = req.body;
 
     const registration = await Registration.findById(registrationId)
       .populate('event workshop');
@@ -36,47 +29,40 @@ exports.createPaymentOrder = async (req, res) => {
     }
 
     // Calculate amount
-    let amount = 0;
-    if (registration.event) {
-      amount += registration.event.fees;
-    }
-    if (registration.workshop) {
-      amount += registration.workshop.fees;
-    }
-    if (registration.accommodationRequired) {
-      amount += 500; // Accommodation fee
-    }
-
-    // Create Razorpay order
-    const options = {
-      amount: amount * 100, // Convert to paise
-      currency: 'INR',
-      receipt: `reg_${registration.registrationNumber}`,
-      notes: {
-        registrationId: registration._id.toString(),
-        userId: req.user.id
+    const finalAmount = amount || (() => {
+      let calculatedAmount = 0;
+      if (registration.event) {
+        calculatedAmount += registration.event.fees;
       }
-    };
-
-    const order = await razorpay.orders.create(options);
+      if (registration.workshop) {
+        calculatedAmount += registration.workshop.fees;
+      }
+      if (registration.accommodationRequired) {
+        calculatedAmount += 500; // Accommodation fee
+      }
+      return calculatedAmount;
+    })();
 
     // Create payment record
     const payment = await Payment.create({
       user: req.user.id,
       registration: registrationId,
-      amount,
+      amount: finalAmount,
       currency: 'INR',
-      razorpayOrderId: order.id,
+      paymentMethod,
+      transactionId: `TXN${Date.now()}${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
       status: 'pending'
     });
 
     res.status(200).json({
       success: true,
+      message: 'Payment order created. Complete payment using provided details.',
       data: {
-        orderId: order.id,
-        amount: amount,
+        paymentId: payment._id,
+        amount: finalAmount,
         currency: 'INR',
-        keyId: process.env.RAZORPAY_KEY_ID,
+        paymentMethod,
+        transactionId: payment.transactionId,
         payment: payment
       }
     });
@@ -93,24 +79,10 @@ exports.createPaymentOrder = async (req, res) => {
 // @access  Private
 exports.verifyPayment = async (req, res) => {
   try {
-    const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
+    const { paymentId, transactionId, status: paymentStatus } = req.body;
 
-    // Verify signature
-    const sign = razorpayOrderId + '|' + razorpayPaymentId;
-    const expectedSign = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-      .update(sign.toString())
-      .digest('hex');
-
-    if (razorpaySignature !== expectedSign) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid payment signature'
-      });
-    }
-
-    // Update payment status
-    const payment = await Payment.findOne({ razorpayOrderId })
+    // Find payment
+    const payment = await Payment.findById(paymentId)
       .populate({
         path: 'registration',
         populate: {
@@ -125,14 +97,23 @@ exports.verifyPayment = async (req, res) => {
       });
     }
 
-    payment.razorpayPaymentId = razorpayPaymentId;
-    payment.razorpaySignature = razorpaySignature;
-    payment.status = 'success';
-    payment.paidAt = Date.now();
+    // Verify user owns this payment
+    if (payment.user.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized'
+      });
+    }
+
+    // Update payment with transaction details
+    payment.transactionId = transactionId || payment.transactionId;
+    payment.status = paymentStatus || 'success';
+    payment.paymentDate = Date.now();
     await payment.save();
 
     // Update registration status
     const registration = await Registration.findById(payment.registration._id);
+    registration.paymentStatus = 'paid';
     registration.status = 'confirmed';
     registration.payment = payment._id;
     await registration.save();
@@ -313,54 +294,5 @@ exports.refundPayment = async (req, res) => {
       success: false,
       message: error.message
     });
-  }
-};
-
-// @desc    Razorpay webhook
-// @route   POST /api/v1/payments/razorpay/webhook
-// @access  Public
-exports.razorpayWebhook = async (req, res) => {
-  try {
-    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
-
-    // Verify webhook signature
-    const signature = req.headers['x-razorpay-signature'];
-    const body = JSON.stringify(req.body);
-
-    const expectedSignature = crypto
-      .createHmac('sha256', secret)
-      .update(body)
-      .digest('hex');
-
-    if (signature !== expectedSignature) {
-      return res.status(400).json({ success: false, message: 'Invalid signature' });
-    }
-
-    const event = req.body.event;
-    const paymentEntity = req.body.payload.payment.entity;
-
-    // Handle different events
-    switch (event) {
-      case 'payment.captured':
-        // Payment was successful
-        await Payment.findOneAndUpdate(
-          { razorpayPaymentId: paymentEntity.id },
-          { status: 'success', paidAt: Date.now() }
-        );
-        break;
-
-      case 'payment.failed':
-        // Payment failed
-        await Payment.findOneAndUpdate(
-          { razorpayPaymentId: paymentEntity.id },
-          { status: 'failed' }
-        );
-        break;
-    }
-
-    res.status(200).json({ success: true });
-  } catch (error) {
-    console.error('Webhook error:', error);
-    res.status(500).json({ success: false, message: error.message });
   }
 };

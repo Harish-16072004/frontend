@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import './Home.css';
+import '../styles/Home.css';
 import aboutIcon from '../assets/images/about-icon.png';
 
 function Home() {

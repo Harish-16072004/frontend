@@ -160,12 +160,16 @@ aws-config/*.pem
 google-credentials.json
 service-account-key.json
 *-service-account.json
+shackles-sheets-exporter-*.json
+*.json.backup
 
 # ==========================================
 # Payment Gateway Keys
 # ==========================================
 razorpay-keys.json
 payment-credentials.json
+payment-proof/
+participant-qr-code/
 
 # ==========================================
 # SSL/TLS Certificates
@@ -220,3 +224,36 @@ payment-credentials.json
 *.pid
 *.seed
 *.pid.lock
+
+# ==========================================
+# Project-Specific
+# ==========================================
+# Documentation that may contain sensitive info
+**/MONGODB_ATLAS_SETUP.md
+**/AWS_S3_SETUP.md
+
+# Test scripts output
+test-results/
+test-output/
+*.test.log
+
+# Generated QR codes (keep template, ignore generated)
+/backend/generated-qr/
+/server/generated-qr/
+
+# Email templates with credentials
+email-templates/*.backup
+
+# MongoDB exports/dumps
+*.bson
+mongodb-dumps/
+db-backups/
+
+# Development notes with credentials
+SETUP_NOTES.md
+CREDENTIALS.md
+PRIVATE_*.md
+
+# PowerShell test outputs
+test-*.txt
+test-output-*.json
