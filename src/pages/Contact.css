@@ -1,0 +1,507 @@
+.contact {
+  min-height: 100vh;
+}
+
+.contact-hero {
+  padding: 6rem 2rem 4rem;
+  text-align: center;
+  background: linear-gradient(135deg, #0a1a14 0%, #000000 50%, #1a0a14 100%);
+}
+
+.contact-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 30px rgba(10, 215, 161, 0.6);
+}
+
+.contact-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+}
+
+.contact-info-section {
+  padding: 4rem 2rem;
+  background: #000000;
+}
+
+.contact-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.contact-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2.5rem;
+}
+
+.contact-card {
+  background: linear-gradient(135deg, rgba(10, 215, 161, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.contact-card:hover {
+  transform: translateY(-10px);
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 15px 40px rgba(10, 215, 161, 0.3);
+}
+
+.contact-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+}
+
+.contact-card-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1.5rem;
+}
+
+.contact-item {
+  margin-bottom: 1rem;
+}
+
+.contact-label {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.contact-value {
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: block;
+  transition: color 0.3s ease;
+}
+
+.contact-value:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.contact-coordinators {
+  padding: 4rem 2rem;
+  background: linear-gradient(180deg, #000000 0%, #1a0a14 100%);
+}
+
+.coordinators-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.coordinators-container h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  margin-bottom: 3rem;
+  text-shadow: 0 0 20px rgba(227, 27, 108, 0.5);
+}
+
+.coordinators-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 3rem;
+}
+
+.coordinator-category {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.5) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  padding: 2.5rem;
+}
+
+.category-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.6rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.technical-title {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.non-technical-title {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.special-title {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.category-symbol {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.coordinator-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.coordinator-item {
+  padding: 1.5rem;
+  background: rgba(10, 215, 161, 0.05);
+  border-radius: 15px;
+  border: 1px solid rgba(10, 215, 161, 0.2);
+  transition: all 0.3s ease;
+}
+
+.coordinator-item:hover {
+  background: rgba(10, 215, 161, 0.1);
+  border-color: rgba(255, 255, 255, 0.8);
+  transform: translateX(5px);
+}
+
+.coordinator-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.coordinator-event {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.coordinator-item a {
+  display: inline-block;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.coordinator-item a:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.contact-map {
+  padding: 4rem 2rem;
+  background: #000000;
+}
+
+.map-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.map-container h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  margin-bottom: 2.5rem;
+  text-shadow: 0 0 20px rgba(10, 215, 161, 0.5);
+}
+
+.map-wrapper {
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(10, 215, 161, 0.3);
+  margin-bottom: 2rem;
+}
+
+.map-info {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(10, 215, 161, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+}
+
+.map-address {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.map-address strong {
+  color: rgba(255, 255, 255, 0.8);
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+}
+
+.contact-form-section {
+  padding: 4rem 2rem;
+  background: linear-gradient(180deg, #000000 0%, #0a1a14 100%);
+}
+
+.form-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.form-container h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 20px rgba(227, 27, 108, 0.5);
+}
+
+.form-desc {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin-bottom: 3rem;
+}
+
+.contact-form {
+  background: linear-gradient(135deg, rgba(227, 27, 108, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  padding: 3rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.form-group label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.form-group input,
+.form-group textarea {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  padding: 1rem 1.5rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(10, 215, 161, 0.3);
+  border-radius: 10px;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.8);
+  background: rgba(10, 215, 161, 0.05);
+  box-shadow: 0 0 15px rgba(10, 215, 161, 0.2);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 150px;
+}
+
+.btn-submit {
+  width: 100%;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  padding: 1.2rem 3rem;
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--bg-primary);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 20px rgba(10, 215, 161, 0.5);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-message {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.form-message.success {
+  background: rgba(10, 215, 161, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.form-message.error {
+  background: rgba(227, 27, 108, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.contact-social {
+  padding: 4rem 2rem;
+  background: #000000;
+}
+
+.social-container {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.social-container h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 3rem;
+  text-shadow: 0 0 20px rgba(255, 191, 0, 0.5);
+}
+
+.social-links {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem 2.5rem;
+  background: linear-gradient(135deg, rgba(10, 215, 161, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+  border: 2px solid;
+  border-radius: 50px;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 500px;
+  justify-content: center;
+}
+
+.social-link.instagram {
+  border-color: #E4405F;
+}
+
+.social-link.instagram:hover {
+  background: #E4405F;
+  color: white;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(228, 64, 95, 0.4);
+}
+
+.social-link.linkedin {
+  border-color: #0077B5;
+}
+
+.social-link.linkedin:hover {
+  background: #0077B5;
+  color: white;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 119, 181, 0.4);
+}
+
+.contact-cta {
+  padding: 5rem 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, #1a0a14 0%, #000000 50%, #0a1a14 100%);
+}
+
+.contact-cta h2 {
+  font-family: 'GameOfSquids', sans-serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 20px rgba(227, 27, 108, 0.6);
+}
+
+.contact-cta p {
+  font-size: 1.3rem;
+  color: var(--text-secondary);
+  margin-bottom: 3rem;
+}
+
+.btn-register-contact {
+  display: inline-block;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  padding: 1.2rem 3.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--bg-primary);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50px;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 30px rgba(10, 215, 161, 0.4);
+}
+
+.btn-register-contact:hover {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 40px rgba(10, 215, 161, 0.6);
+}
+
+@media (max-width: 768px) {
+  .contact-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .coordinators-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-form {
+    padding: 2rem 1.5rem;
+  }
+
+  .social-links {
+    width: 100%;
+  }
+
+  .social-link {
+    width: 100%;
+  }
+}
+

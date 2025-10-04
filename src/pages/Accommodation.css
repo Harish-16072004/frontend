@@ -1,0 +1,403 @@
+.accommodation {
+  min-height: 100vh;
+}
+
+.accommodation-hero {
+  padding: 6rem 2rem 4rem;
+  text-align: center;
+  background: linear-gradient(135deg, #1a0a14 0%, #000000 50%, #0a1a14 100%);
+}
+
+.accommodation-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  color: var(--player-green);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 30px rgba(10, 215, 161, 0.6);
+}
+
+.accommodation-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+}
+
+.accommodation-info {
+  padding: 4rem 2rem;
+  background: #000000;
+}
+
+.info-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.info-content h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  color: var(--guard-pink);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.info-desc {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto 3rem;
+}
+
+.facility-highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.highlight-card {
+  background: linear-gradient(135deg, rgba(10, 215, 161, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+  border: 2px solid var(--player-green);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.highlight-card:hover {
+  transform: translateY(-10px);
+  border-color: var(--guard-pink);
+  box-shadow: 0 10px 40px rgba(10, 215, 161, 0.3);
+}
+
+.highlight-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 1.5rem;
+}
+
+.highlight-card h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.4rem;
+  color: var(--player-green);
+  margin-bottom: 1rem;
+}
+
+.highlight-card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.accommodation-details {
+  padding: 4rem 2rem;
+  background: linear-gradient(180deg, #000000 0%, #1a0a14 100%);
+}
+
+.details-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 3rem;
+}
+
+.details-card,
+.amenities-card {
+  background: linear-gradient(135deg, rgba(227, 27, 108, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+  border: 2px solid var(--guard-pink);
+  border-radius: 20px;
+  padding: 3rem;
+}
+
+.details-card h2,
+.amenities-card h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2rem;
+  color: var(--guard-pink);
+  margin-bottom: 2.5rem;
+}
+
+.detail-item {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(10, 215, 161, 0.2);
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.detail-icon {
+  font-size: 1.5rem;
+}
+
+.detail-label strong {
+  font-family: 'Orbitron', sans-serif;
+  color: var(--player-green);
+  font-size: 1.1rem;
+}
+
+.detail-item p {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  padding-left: 2.3rem;
+}
+
+.amenities-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.amenities-list li {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.check-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: var(--player-green);
+  color: var(--bg-primary);
+  border-radius: 50%;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.accommodation-rules {
+  padding: 4rem 2rem;
+  background: #000000;
+}
+
+.rules-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.rules-container h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  color: var(--vip-gold);
+  margin-bottom: 3rem;
+  text-align: center;
+  text-shadow: 0 0 20px rgba(255, 191, 0, 0.5);
+}
+
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.rule-card {
+  background: linear-gradient(135deg, rgba(255, 191, 0, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+  border: 2px solid var(--vip-gold);
+  border-radius: 20px;
+  padding: 2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.rule-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--player-green);
+  box-shadow: 0 10px 30px rgba(255, 191, 0, 0.3);
+}
+
+.rule-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  background: var(--vip-gold);
+  color: var(--bg-primary);
+  border-radius: 50%;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.rule-card p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 1.05rem;
+  padding-top: 0.5rem;
+}
+
+.accommodation-contact {
+  padding: 4rem 2rem;
+  background: linear-gradient(180deg, #000000 0%, #0a1a14 100%);
+}
+
+.contact-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.contact-container h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  color: var(--player-green);
+  margin-bottom: 3rem;
+  text-shadow: 0 0 20px rgba(10, 215, 161, 0.5);
+}
+
+.coordinators-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 3rem;
+  margin-bottom: 2.5rem;
+}
+
+.coordinator-card {
+  background: linear-gradient(135deg, rgba(10, 215, 161, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+  border: 3px solid var(--player-green);
+  border-radius: 25px;
+  padding: 3rem 2rem;
+  transition: all 0.3s ease;
+}
+
+.coordinator-card:hover {
+  transform: translateY(-10px);
+  border-color: var(--guard-pink);
+  box-shadow: 0 15px 50px rgba(10, 215, 161, 0.4);
+}
+
+.coordinator-icon {
+  font-size: 5rem;
+  margin-bottom: 1.5rem;
+}
+
+.coordinator-card h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.5rem;
+  color: var(--player-green);
+  margin-bottom: 1rem;
+}
+
+.coordinator-name {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.coordinator-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: var(--player-green);
+  color: var(--bg-primary);
+  border-radius: 50px;
+  text-decoration: none;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.coordinator-phone:hover {
+  background: transparent;
+  color: var(--player-green);
+  border: 2px solid var(--player-green);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 20px rgba(10, 215, 161, 0.4);
+}
+
+.phone-icon {
+  font-size: 1.3rem;
+}
+
+.contact-note {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  font-style: italic;
+  margin-top: 2rem;
+}
+
+.accommodation-cta {
+  padding: 5rem 2rem;
+  text-align: center;
+  background: #000000;
+}
+
+.accommodation-cta h2 {
+  font-family: 'GameOfSquids', sans-serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: var(--guard-pink);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 20px rgba(227, 27, 108, 0.6);
+}
+
+.accommodation-cta p {
+  font-size: 1.3rem;
+  color: var(--text-secondary);
+  margin-bottom: 3rem;
+}
+
+.btn-register-accommodation {
+  display: inline-block;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  padding: 1.2rem 3.5rem;
+  background: var(--player-green);
+  color: var(--bg-primary);
+  border: 2px solid var(--player-green);
+  border-radius: 50px;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 30px rgba(10, 215, 161, 0.4);
+}
+
+.btn-register-accommodation:hover {
+  background: transparent;
+  color: var(--player-green);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 40px rgba(10, 215, 161, 0.6);
+}
+
+@media (max-width: 768px) {
+  .facility-highlights {
+    grid-template-columns: 1fr;
+  }
+
+  .details-container {
+    grid-template-columns: 1fr;
+  }
+
+  .rules-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .coordinators-grid {
+    grid-template-columns: 1fr;
+  }
+}
