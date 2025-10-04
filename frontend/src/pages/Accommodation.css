@@ -1,0 +1,410 @@
+.accommodation {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+  color: #ffffff;
+  padding-top: 80px;
+}
+
+.accommodation-hero {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: linear-gradient(135deg, #ff0040, #ff4080);
+  margin-bottom: 0;
+}
+
+.accommodation-title {
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin: 0 0 1rem 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: 2px;
+}
+
+.accommodation-subtitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  opacity: 0.9;
+  letter-spacing: 1px;
+}
+
+.accommodation-main {
+  padding: 4rem 1rem;
+  background: #0a0a0a;
+}
+
+.accommodation-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 4rem;
+  align-items: start;
+}
+
+/* Rules Section */
+.rules-section {
+  background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+  border-radius: 20px;
+  padding: 3rem;
+  border: 2px solid #ff0040;
+  box-shadow: 0 10px 30px rgba(255, 0, 64, 0.2);
+}
+
+.rules-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  color: #ff0040;
+  text-shadow: 0 0 10px rgba(255, 0, 64, 0.5);
+  letter-spacing: 3px;
+}
+
+.rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.rule-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border-left: 4px solid #ff0040;
+  transition: all 0.3s ease;
+}
+
+.rule-item:hover {
+  background: rgba(255, 0, 64, 0.1);
+  transform: translateX(5px);
+}
+
+.rule-number {
+  background: linear-gradient(135deg, #ff0040, #ff4080);
+  color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.rule-item p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  font-weight: 500;
+  color: #e0e0e0;
+}
+
+/* Registration Form Section */
+.registration-form-section {
+  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  border-radius: 20px;
+  padding: 3rem;
+  border: 2px solid #4a9eff;
+  box-shadow: 0 10px 30px rgba(74, 158, 255, 0.2);
+  position: sticky;
+  top: 100px;
+}
+
+.accommodation-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #4a9eff;
+  margin-bottom: 1rem;
+  letter-spacing: 1px;
+}
+
+.date-selection {
+  display: flex;
+  gap: 1rem;
+}
+
+.date-btn {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border: 2px solid #4a9eff;
+  background: transparent;
+  color: #4a9eff;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.date-btn:hover {
+  background: rgba(74, 158, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.date-btn.active {
+  background: linear-gradient(135deg, #4a9eff, #2575fc);
+  color: white;
+  box-shadow: 0 5px 15px rgba(74, 158, 255, 0.4);
+}
+
+.selected-indicator {
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.selected-dates-info {
+  margin-top: 1rem;
+  padding: 0.8rem 1.2rem;
+  background: rgba(74, 158, 255, 0.1);
+  border: 1px solid rgba(74, 158, 255, 0.3);
+  border-radius: 8px;
+  color: #4a9eff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.gender-selection {
+  margin-bottom: 1rem;
+}
+
+.gender-select {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border: 2px solid #4a9eff;
+  background: rgba(74, 158, 255, 0.1);
+  color: white;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.gender-select:focus {
+  outline: none;
+  border-color: #2575fc;
+  box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.2);
+}
+
+.gender-select option {
+  background: #1a1a1a;
+  color: white;
+  padding: 0.5rem;
+}
+
+/* Checkbox Styling */
+.rules-checkbox {
+  margin: 1rem 0;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #e0e0e0;
+  line-height: 1.4;
+}
+
+.checkbox-container input[type="checkbox"] {
+  display: none;
+}
+
+.checkmark {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #4a9eff;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark {
+  background: linear-gradient(135deg, #4a9eff, #2575fc);
+  border-color: #2575fc;
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark::after {
+  content: '✓';
+  color: white;
+  font-weight: 900;
+  font-size: 0.8rem;
+}
+
+/* Register Button */
+.register-btn {
+  padding: 1.2rem 2rem;
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 1rem;
+}
+
+.register-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(247, 147, 30, 0.4);
+}
+
+/* Contact Section */
+.accommodation-contact {
+  background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+  padding: 4rem 1rem;
+}
+
+.contact-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.contact-container h2 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin-bottom: 3rem;
+  color: #4a9eff;
+  text-shadow: 0 0 10px rgba(74, 158, 255, 0.5);
+}
+
+.coordinators-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.coordinator-card {
+  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  padding: 2.5rem;
+  border-radius: 20px;
+  border: 2px solid #4a9eff;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.coordinator-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(74, 158, 255, 0.3);
+}
+
+.coordinator-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.coordinator-card h3 {
+  font-size: 1.5rem;
+  color: #4a9eff;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.coordinator-name {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.coordinator-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #4a9eff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.8rem 1.5rem;
+  background: rgba(74, 158, 255, 0.1);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.coordinator-phone:hover {
+  background: rgba(74, 158, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.phone-icon {
+  font-size: 1.2rem;
+}
+
+.contact-note {
+  color: #b0b0b0;
+  font-style: italic;
+  margin-top: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .accommodation-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .registration-form-section {
+    position: static;
+  }
+  
+  .accommodation-title {
+    font-size: 2.5rem;
+  }
+  
+  .rules-section,
+  .registration-form-section {
+    padding: 2rem;
+  }
+  
+  .rules-title {
+    font-size: 2rem;
+  }
+  
+  .date-selection {
+    flex-direction: column;
+  }
+  
+  .date-btn {
+    flex: none;
+    width: 100%;
+  }
+  
+  .coordinators-grid {
+    grid-template-columns: 1fr;
+  }
+}
