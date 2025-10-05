@@ -10,18 +10,21 @@ const Register = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [submitted, setSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     // Personal Details
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     college: '',
     department: '',
     year: '',
-    // Event Selection
-    events: [],
-    workshops: [],
-    needsAccommodation: false,
+    collegeLocation: '',
+    password: '',
+    confirmPassword: '',
+    // Registration Type
+    registrationType: '', // 'general', 'workshop', 'both'
     // Payment
     paymentScreenshot: null,
     transactionId: '',
@@ -29,24 +32,16 @@ const Register = () => {
     termsAccepted: false
   });
 
-  const events = [
-    { id: 'paper-presentation', name: 'Paper Presentation', fee: 299, category: 'technical' },
-    { id: 'project-expo', name: 'Project Expo', fee: 299, category: 'technical' },
-    { id: 'cad-modelling', name: 'CAD Modelling', fee: 299, category: 'technical' },
-    { id: 'connection', name: 'Connection', fee: 299, category: 'technical' },
-    { id: 'treasure-hunt', name: 'Treasure Hunt', fee: 299, category: 'technical' },
-    { id: 'reverse-engineering', name: 'Reverse Engineering', fee: 299, category: 'technical' },
-    { id: 'ipl-auction', name: 'IPL Auction', fee: 299, category: 'non-technical' },
-    { id: 'kollywood-quiz', name: 'Kollywood Quiz', fee: 299, category: 'non-technical' },
-    { id: 'red-light-green-light', name: 'Red Light Green Light', fee: 299, category: 'non-technical' },
-    { id: 'idea-pitching', name: 'Idea Pitching', fee: 299, category: 'special' },
-    { id: 'robo-soccer', name: 'Robo Soccer', fee: 299, category: 'special' }
-  ];
-
-  const workshops = [
-    { id: 'additive-manufacturing', name: 'Additive Manufacturing (3D Printing)', fee: 199, time: '10:00 AM - 1:00 PM' },
-    { id: 'iot', name: 'IoT & Smart Systems', fee: 199, time: '2:00 PM - 5:00 PM' }
-  ];
+  // Payment QR codes - Replace these URLs with your actual QR code image URLs
+  const qrCodes = {
+    general: '/qr-general-299.png', // Replace with actual QR for ₹299
+    workshop: '/qr-workshop-199.png', // Replace with actual QR for ₹199
+    both: '/qr-both-499.png', // Replace with actual QR for ₹499
+    dummy: '/qr-dummy.png' // Replace with dummy/placeholder image
+  };
+  
+  // Fallback placeholder (base64 encoded simple image)
+  const fallbackQR = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzFhMWExYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNDUlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlFSIENvZGU8L3RleHQ+PHRleHQgeD0iNTAlIiB5PSI1NSUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgZmlsbD0iI2FhYSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UGxhY2Vob2xkZXI8L3RleHQ+PC9zdmc+';
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -57,22 +52,10 @@ const Register = () => {
     setError('');
   };
 
-  const handleEventSelection = (eventId) => {
+  const handleRegistrationTypeChange = (type) => {
     setFormData(prev => ({
       ...prev,
-      events: prev.events.includes(eventId)
-        ? prev.events.filter(id => id !== eventId)
-        : [...prev.events, eventId]
-    }));
-    setError('');
-  };
-
-  const handleWorkshopSelection = (workshopId) => {
-    setFormData(prev => ({
-      ...prev,
-      workshops: prev.workshops.includes(workshopId)
-        ? prev.workshops.filter(id => id !== workshopId)
-        : [...prev.workshops, workshopId]
+      registrationType: type
     }));
     setError('');
   };
@@ -93,16 +76,30 @@ const Register = () => {
     }
   };
 
-  const calculateTotal = () => {
-    const eventsFee = formData.events.length * 299;
-    const workshopsFee = formData.workshops.length * 199;
-    const accommodationFee = formData.needsAccommodation ? 300 : 0;
-    return eventsFee + workshopsFee + accommodationFee;
+  const getAmount = () => {
+    switch (formData.registrationType) {
+      case 'general':
+        return 299;
+      case 'workshop':
+        return 199;
+      case 'both':
+        return 499;
+      default:
+        return 0;
+    }
+  };
+
+  const getQRCode = () => {
+    if (!formData.registrationType) {
+      return qrCodes.dummy;
+    }
+    return qrCodes[formData.registrationType] || qrCodes.dummy;
   };
 
   const validateStep1 = () => {
-    if (!formData.name || !formData.email || !formData.phone || 
-        !formData.college || !formData.department || !formData.year) {
+    if (!formData.firstName || !formData.lastName || !formData.email || 
+        !formData.phone || !formData.college || !formData.department || 
+        !formData.year || !formData.collegeLocation) {
       setError('Please fill in all personal details');
       return false;
     }
@@ -114,24 +111,28 @@ const Register = () => {
       setError('Please enter a valid 10-digit phone number');
       return false;
     }
+    if (!formData.password || formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return false;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return false;
+    }
     return true;
   };
 
   const validateStep2 = () => {
-    if (formData.events.length === 0 && formData.workshops.length === 0) {
-      setError('Please select at least one event or workshop');
-      return false;
-    }
-    return true;
-  };
-
-  const validateStep3 = () => {
-    if (!formData.paymentScreenshot) {
-      setError('Please upload payment screenshot');
+    if (!formData.registrationType) {
+      setError('Please select a registration type');
       return false;
     }
     if (!formData.transactionId) {
       setError('Please enter transaction ID');
+      return false;
+    }
+    if (!formData.paymentScreenshot) {
+      setError('Please upload payment screenshot');
       return false;
     }
     if (!formData.termsAccepted) {
@@ -145,8 +146,6 @@ const Register = () => {
     setError('');
     if (step === 1 && validateStep1()) {
       setStep(2);
-    } else if (step === 2 && validateStep2()) {
-      setStep(3);
     }
   };
 
@@ -157,7 +156,7 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateStep3()) return;
+    if (!validateStep2()) return;
 
     setLoading(true);
     setError('');
@@ -165,24 +164,58 @@ const Register = () => {
     try {
       // Create FormData for file upload
       const submitData = new FormData();
-      Object.keys(formData).forEach(key => {
-        if (key === 'events' || key === 'workshops') {
-          submitData.append(key, JSON.stringify(formData[key]));
-        } else if (key === 'paymentScreenshot' && formData[key]) {
-          submitData.append(key, formData[key]);
-        } else {
-          submitData.append(key, formData[key]);
-        }
-      });
+      
+      // Combine first and last name
+      submitData.append('name', `${formData.firstName} ${formData.lastName}`);
+      submitData.append('email', formData.email);
+      submitData.append('phone', formData.phone);
+      submitData.append('college', formData.college);
+      submitData.append('department', formData.department);
+      submitData.append('year', formData.year);
+      submitData.append('collegeLocation', formData.collegeLocation);
+      submitData.append('password', formData.password);
+      submitData.append('registrationType', formData.registrationType);
+      submitData.append('amount', getAmount());
+      submitData.append('transactionId', formData.transactionId);
+      submitData.append('termsAccepted', formData.termsAccepted);
+      
+      if (formData.paymentScreenshot) {
+        submitData.append('paymentScreenshot', formData.paymentScreenshot);
+      }
 
       await register(submitData);
-      navigate('/profile');
+      setSubmitted(true);
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
+  // Success screen after submission
+  if (submitted) {
+    return (
+      <div className="register-page">
+        <div className="register-container">
+          <div className="register-card success-card">
+            <div className="success-icon">✓</div>
+            <h1 className="success-title">Registration Submitted!</h1>
+            <p className="success-message">
+              Your response has been submitted successfully. You will be notified through your registered email ID after verification.
+            </p>
+            <div className="success-details">
+              <p><strong>Email:</strong> {formData.email}</p>
+              <p><strong>Registration Type:</strong> {formData.registrationType.charAt(0).toUpperCase() + formData.registrationType.slice(1)}</p>
+              <p><strong>Amount:</strong> ₹{getAmount()}</p>
+            </div>
+            <Link to="/login" className="back-home-btn">
+              Go to Login →
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="register-page">
@@ -196,16 +229,11 @@ const Register = () => {
             <div className="progress-bar">
               <div className={`progress-step ${step >= 1 ? 'active' : ''}`}>
                 <div className="step-number">1</div>
-                <div className="step-label">Personal</div>
+                <div className="step-label">Personal Details</div>
               </div>
               <div className={`progress-line ${step >= 2 ? 'active' : ''}`}></div>
               <div className={`progress-step ${step >= 2 ? 'active' : ''}`}>
                 <div className="step-number">2</div>
-                <div className="step-label">Events</div>
-              </div>
-              <div className={`progress-line ${step >= 3 ? 'active' : ''}`}></div>
-              <div className={`progress-step ${step >= 3 ? 'active' : ''}`}>
-                <div className="step-number">3</div>
                 <div className="step-label">Payment</div>
               </div>
             </div>
@@ -224,46 +252,63 @@ const Register = () => {
               <div className="form-step">
                 <h2 className="step-title">■ Personal Details</h2>
                 
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="firstName" className="form-label">First Name</label>
+                    <input
+                      type="text"
+                      id="firstName"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      placeholder="Enter your first name"
+                      className="form-input"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="lastName" className="form-label">Last Name</label>
+                    <input
+                      type="text"
+                      id="lastName"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      placeholder="Enter your last name"
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                </div>
+
                 <div className="form-group">
-                  <label htmlFor="name" className="form-label">Full Name</label>
+                  <label htmlFor="email" className="form-label">Email Address</label>
                   <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
                     onChange={handleChange}
-                    placeholder="Enter your full name"
+                    placeholder="your.email@example.com"
                     className="form-input"
+                    required
                   />
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="email" className="form-label">Email Address</label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="your.email@example.com"
-                      className="form-input"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="phone" className="form-label">Phone Number</label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      placeholder="10-digit mobile number"
-                      className="form-input"
-                      maxLength="10"
-                    />
-                  </div>
+                <div className="form-group">
+                  <label htmlFor="phone" className="form-label">Mobile Number</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="10-digit mobile number"
+                    className="form-input"
+                    maxLength="10"
+                    required
+                  />
                 </div>
 
                 <div className="form-group">
@@ -276,6 +321,21 @@ const Register = () => {
                     onChange={handleChange}
                     placeholder="Your college/institution name"
                     className="form-input"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="collegeLocation" className="form-label">Location of College</label>
+                  <input
+                    type="text"
+                    id="collegeLocation"
+                    name="collegeLocation"
+                    value={formData.collegeLocation}
+                    onChange={handleChange}
+                    placeholder="City, State"
+                    className="form-input"
+                    required
                   />
                 </div>
 
@@ -290,6 +350,7 @@ const Register = () => {
                       onChange={handleChange}
                       placeholder="e.g., Mechanical Engineering"
                       className="form-input"
+                      required
                     />
                   </div>
 
@@ -301,6 +362,7 @@ const Register = () => {
                       value={formData.year}
                       onChange={handleChange}
                       className="form-input"
+                      required
                     >
                       <option value="">Select Year</option>
                       <option value="1">First Year</option>
@@ -310,161 +372,142 @@ const Register = () => {
                     </select>
                   </div>
                 </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="password" className="form-label">Password</label>
+                    <input
+                      type="password"
+                      id="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="Enter password (min 6 characters)"
+                      className="form-input"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="confirmPassword" className="form-label">Re-enter Password</label>
+                    <input
+                      type="password"
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      placeholder="Re-enter password"
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                </div>
               </div>
             )}
 
-            {/* Step 2: Event Selection */}
+            {/* Step 2: Payment Section */}
             {step === 2 && (
               <div className="form-step">
-                <h2 className="step-title">○ Select Events & Workshops</h2>
+                <h2 className="step-title">○ Registration & Payment</h2>
                 
-                <div className="selection-section">
-                  <h3 className="section-title">■ Technical Events (₹299 each)</h3>
-                  <div className="selection-grid">
-                    {events.filter(e => e.category === 'technical').map(event => (
-                      <label key={event.id} className="selection-card">
-                        <input
-                          type="checkbox"
-                          checked={formData.events.includes(event.id)}
-                          onChange={() => handleEventSelection(event.id)}
-                        />
-                        <span className="card-content">
-                          <span className="card-name">{event.name}</span>
-                          <span className="card-fee">₹{event.fee}</span>
-                        </span>
-                      </label>
-                    ))}
+                <div className="registration-type-section">
+                  <h3 className="section-title">Select Registration Type</h3>
+                  <div className="registration-buttons">
+                    <button
+                      type="button"
+                      className={`registration-btn ${formData.registrationType === 'general' ? 'active' : ''}`}
+                      onClick={() => handleRegistrationTypeChange('general')}
+                    >
+                      <span className="btn-icon">■</span>
+                      <span className="btn-text">General Registration</span>
+                      <span className="btn-price">₹299</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={`registration-btn ${formData.registrationType === 'workshop' ? 'active' : ''}`}
+                      onClick={() => handleRegistrationTypeChange('workshop')}
+                    >
+                      <span className="btn-icon">○</span>
+                      <span className="btn-text">Workshop Only</span>
+                      <span className="btn-price">₹199</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className={`registration-btn ${formData.registrationType === 'both' ? 'active' : ''}`}
+                      onClick={() => handleRegistrationTypeChange('both')}
+                    >
+                      <span className="btn-icon">◈</span>
+                      <span className="btn-text">Both (General + Workshop)</span>
+                      <span className="btn-price">₹499</span>
+                    </button>
                   </div>
-                </div>
 
-                <div className="selection-section">
-                  <h3 className="section-title">○ Non-Technical Events (₹299 each)</h3>
-                  <div className="selection-grid">
-                    {events.filter(e => e.category === 'non-technical').map(event => (
-                      <label key={event.id} className="selection-card">
-                        <input
-                          type="checkbox"
-                          checked={formData.events.includes(event.id)}
-                          onChange={() => handleEventSelection(event.id)}
-                        />
-                        <span className="card-content">
-                          <span className="card-name">{event.name}</span>
-                          <span className="card-fee">₹{event.fee}</span>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="selection-section">
-                  <h3 className="section-title">△ Special Events (₹299 each)</h3>
-                  <div className="selection-grid">
-                    {events.filter(e => e.category === 'special').map(event => (
-                      <label key={event.id} className="selection-card">
-                        <input
-                          type="checkbox"
-                          checked={formData.events.includes(event.id)}
-                          onChange={() => handleEventSelection(event.id)}
-                        />
-                        <span className="card-content">
-                          <span className="card-name">{event.name}</span>
-                          <span className="card-fee">₹{event.fee}</span>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="selection-section">
-                  <h3 className="section-title">◈ Workshops (₹199 each)</h3>
-                  <div className="selection-grid">
-                    {workshops.map(workshop => (
-                      <label key={workshop.id} className="selection-card">
-                        <input
-                          type="checkbox"
-                          checked={formData.workshops.includes(workshop.id)}
-                          onChange={() => handleWorkshopSelection(workshop.id)}
-                        />
-                        <span className="card-content">
-                          <span className="card-name">{workshop.name}</span>
-                          <span className="card-time">{workshop.time}</span>
-                          <span className="card-fee">₹{workshop.fee}</span>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="selection-section">
-                  <label className="accommodation-checkbox">
-                    <input
-                      type="checkbox"
-                      name="needsAccommodation"
-                      checked={formData.needsAccommodation}
-                      onChange={handleChange}
-                    />
-                    <span className="checkbox-text">
-                      I need accommodation (₹300 for 2 nights: Oct 22-24, 2025)
-                    </span>
-                  </label>
-                </div>
-
-                <div className="total-section">
-                  <span className="total-label">Total Amount:</span>
-                  <span className="total-amount">₹{calculateTotal()}</span>
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Payment */}
-            {step === 3 && (
-              <div className="form-step">
-                <h2 className="step-title">△ Payment Details</h2>
-                
-                <div className="payment-info">
-                  <h3 className="info-title">Payment Instructions</h3>
-                  <div className="info-content">
-                    <p><strong>Total Amount to Pay: ₹{calculateTotal()}</strong></p>
-                    <p>Payment Methods:</p>
-                    <ul>
-                      <li><strong>UPI:</strong> shackles2025@acgcet</li>
-                      <li><strong>Account No:</strong> 1234567890</li>
-                      <li><strong>IFSC Code:</strong> SBIN0012345</li>
-                      <li><strong>Account Name:</strong> SHACKLES 2025</li>
-                    </ul>
-                    <p className="warning-text">⚠ Please complete payment before uploading screenshot</p>
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="transactionId" className="form-label">Transaction ID / Reference Number</label>
-                  <input
-                    type="text"
-                    id="transactionId"
-                    name="transactionId"
-                    value={formData.transactionId}
-                    onChange={handleChange}
-                    placeholder="Enter transaction/reference ID"
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="paymentScreenshot" className="form-label">Upload Payment Screenshot</label>
-                  <input
-                    type="file"
-                    id="paymentScreenshot"
-                    name="paymentScreenshot"
-                    onChange={handleFileChange}
-                    accept="image/*"
-                    className="file-input"
-                  />
-                  {formData.paymentScreenshot && (
-                    <div className="file-preview">
-                      ✓ {formData.paymentScreenshot.name}
+                  {formData.registrationType && (
+                    <div className="amount-display">
+                      <span className="amount-label">Total Amount:</span>
+                      <span className="amount-value">₹{getAmount()}</span>
                     </div>
                   )}
-                  <p className="input-hint">Max size: 5MB | Formats: JPG, PNG, JPEG</p>
+                </div>
+
+                <div className="qr-section">
+                  <h3 className="section-title">Payment QR Code</h3>
+                  <div className="qr-container">
+                    <img 
+                      src={getQRCode()} 
+                      alt="Payment QR Code" 
+                      className="qr-image"
+                      onError={(e) => {
+                        e.target.onerror = null; // Prevent infinite loop
+                        e.target.src = fallbackQR;
+                      }}
+                    />
+                    {!formData.registrationType && (
+                      <p className="qr-hint">Select a registration type to view QR code</p>
+                    )}
+                    {formData.registrationType && (
+                      <p className="qr-info">Scan this QR code to pay ₹{getAmount()}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="payment-details-section">
+                  <h3 className="section-title">Payment Details</h3>
+                  
+                  <div className="form-group">
+                    <label htmlFor="transactionId" className="form-label">Transaction ID / Reference Number</label>
+                    <input
+                      type="text"
+                      id="transactionId"
+                      name="transactionId"
+                      value={formData.transactionId}
+                      onChange={handleChange}
+                      placeholder="Enter transaction/reference ID"
+                      className="form-input"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="paymentScreenshot" className="form-label">Upload Payment Screenshot</label>
+                    <input
+                      type="file"
+                      id="paymentScreenshot"
+                      name="paymentScreenshot"
+                      onChange={handleFileChange}
+                      accept="image/*"
+                      className="file-input"
+                      required
+                    />
+                    {formData.paymentScreenshot && (
+                      <div className="file-preview">
+                        ✓ {formData.paymentScreenshot.name}
+                      </div>
+                    )}
+                    <p className="input-hint">Max size: 5MB | Formats: JPG, PNG, JPEG</p>
+                  </div>
                 </div>
 
                 <div className="terms-section">
@@ -474,6 +517,7 @@ const Register = () => {
                       name="termsAccepted"
                       checked={formData.termsAccepted}
                       onChange={handleChange}
+                      required
                     />
                     <span className="checkbox-text">
                       I agree to the <Link to="/terms" target="_blank">terms and conditions</Link> and confirm that all information provided is accurate
@@ -491,20 +535,20 @@ const Register = () => {
                 </button>
               )}
               
-              {step < 3 ? (
+              {step < 2 ? (
                 <button type="button" onClick={handleNext} className="next-btn">
-                  Continue →
+                  Continue to Payment →
                 </button>
               ) : (
                 <button type="submit" className="submit-btn" disabled={loading}>
                   {loading ? (
                     <>
                       <Loader inline={true} size="small" />
-                      <span>Registering...</span>
+                      <span>Submitting...</span>
                     </>
                   ) : (
                     <>
-                      <span>Complete Registration</span>
+                      <span>Submit Registration</span>
                       <span className="btn-symbol">◈</span>
                     </>
                   )}

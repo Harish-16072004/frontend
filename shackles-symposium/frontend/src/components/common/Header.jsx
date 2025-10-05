@@ -49,14 +49,20 @@ const Header = () => {
 
           {isAuthenticated ? (
             <>
-              <Link to="/profile" onClick={closeMenu} className="profile-link">
-                <span className="user-name">{user?.name}</span>
-              </Link>
-              {(user?.role === 'admin' || user?.role === 'organizer') && (
+              {/* Show profile link only for regular users, not admin/coordinator */}
+              {user?.role === 'user' && (
+                <Link to="/profile" onClick={closeMenu} className="profile-link">
+                  <span className="user-name">{user?.name}</span>
+                </Link>
+              )}
+              
+              {/* Show Admin link only for admin/coordinator */}
+              {(user?.role === 'admin' || user?.role === 'coordinator') && (
                 <Link to="/admin" onClick={closeMenu} className="admin-link">
                   Admin
                 </Link>
               )}
+              
               <button onClick={handleLogout} className="btn-logout">
                 Logout
               </button>

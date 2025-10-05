@@ -20,6 +20,8 @@ import EventManagement from './pages/Admin/EventManagement';
 import UserManagement from './pages/Admin/UserManagement';
 import PaymentVerification from './pages/Admin/PaymentVerification';
 import QRScannerPage from './pages/Admin/QRScannerPage';
+import EventCheckIn from './pages/Admin/EventCheckIn';
+import KitDistribution from './pages/Admin/KitDistribution';
 import PrivateRoute from './components/PrivateRoute';
 import './App.css';
 
@@ -44,7 +46,7 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/profile" element={
-                <PrivateRoute>
+                <PrivateRoute userOnly>
                   <Profile />
                 </PrivateRoute>
               } />
@@ -71,6 +73,16 @@ function App() {
               <Route path="/admin/scanner" element={
                 <PrivateRoute adminOnly>
                   <QRScannerPage />
+                </PrivateRoute>
+              } />
+              <Route path="/admin/event-checkin/:eventId" element={
+                <PrivateRoute adminOnly>
+                  <EventCheckIn />
+                </PrivateRoute>
+              } />
+              <Route path="/admin/kit-distribution" element={
+                <PrivateRoute adminOnly>
+                  <KitDistribution />
                 </PrivateRoute>
               } />
             </Routes>

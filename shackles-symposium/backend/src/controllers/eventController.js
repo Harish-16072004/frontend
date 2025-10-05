@@ -8,11 +8,13 @@ exports.getEvents = async (req, res) => {
   try {
     const events = await Event.find({ isActive: true })
       .populate('coordinators', 'name email phone')
+      .populate('registrations')
       .sort('date');
 
     res.status(200).json({
       success: true,
       count: events.length,
+      events: events,
       data: events
     });
   } catch (error) {

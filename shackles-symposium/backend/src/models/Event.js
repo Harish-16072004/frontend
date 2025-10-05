@@ -23,6 +23,10 @@ const EventSchema = new mongoose.Schema({
     enum: ['individual', 'team'],
     default: 'individual'
   },
+  isTeamEvent: {
+    type: Boolean,
+    default: false
+  },
   teamSize: {
     min: Number,
     max: Number

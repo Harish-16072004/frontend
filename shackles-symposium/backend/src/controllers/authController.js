@@ -1,24 +1,89 @@
 const User = require('../models/User');
 const crypto = require('crypto');
 const { sendEmail } = require('../utils/emailService');
+const { uploadToS3 } = require('../middleware/upload');
 
 // @desc    Register user
 // @route   POST /api/v1/auth/register
 // @access  Public
 exports.register = async (req, res, next) => {
   try {
-    const { name, email, phone, password, college, department, year, rollNumber } = req.body;
+    // Debug: Log received data
+    console.log('📝 Registration Request Body:', req.body);
+    console.log('📎 File:', req.file ? 'File received' : 'No file');
+    
+    const { 
+      name, 
+      email, 
+      phone, 
+      password, 
+      college, 
+      department, 
+      year, 
+      collegeLocation,
+      registrationType,
+      amount,
+      transactionId,
+      termsAccepted
+    } = req.body;
+
+    // Validate required fields (note: termsAccepted comes as string from FormData)
+    if (!name || !email || !phone || !password || !college || !department || 
+        !year || !collegeLocation || !registrationType || !transactionId) {
+      console.log('❌ Missing required fields');
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide all required fields'
+      });
+    }
+    
+    // Check termsAccepted (handle both boolean and string)
+    const termsAcceptedBool = termsAccepted === true || termsAccepted === 'true';
+    if (!termsAcceptedBool) {
+      console.log('❌ Terms not accepted');
+      return res.status(400).json({
+        success: false,
+        message: 'Please accept the terms and conditions'
+      });
+    }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      console.log('❌ User already exists with email:', email);
       return res.status(400).json({
         success: false,
         message: 'User already exists with this email'
       });
     }
 
-    // Create user
+    // Check if payment screenshot was uploaded
+    if (!req.file) {
+      console.log('❌ No payment screenshot uploaded');
+      return res.status(400).json({
+        success: false,
+        message: 'Please upload payment screenshot'
+      });
+    }
+
+    console.log('✅ All validations passed, uploading to S3...');
+
+    // Upload file to S3
+    let paymentScreenshotUrl;
+    try {
+      paymentScreenshotUrl = await uploadToS3(req.file);
+      console.log('✅ File uploaded to S3:', paymentScreenshotUrl);
+    } catch (uploadError) {
+      console.error('❌ S3 upload error:', uploadError);
+      return res.status(500).json({
+        success: false,
+        message: 'Error uploading payment screenshot'
+      });
+    }
+
+    console.log('✅ Creating user in database...');
+
+    // Create user with additional fields
     const user = await User.create({
       name,
       email,
@@ -27,24 +92,42 @@ exports.register = async (req, res, next) => {
       college,
       department,
       year,
-      rollNumber
+      collegeLocation,
+      registrationType,
+      paymentAmount: amount,
+      transactionId,
+      paymentScreenshot: paymentScreenshotUrl, // S3 URL
+      paymentStatus: 'pending', // Will be verified by admin
+      termsAccepted: termsAcceptedBool
     });
 
     // Send welcome email
     try {
       await sendEmail({
         to: user.email,
-        subject: 'Welcome to SHACKLES 2025!',
-        template: 'welcome',
+        subject: 'Registration Received - SHACKLES 2025!',
+        template: 'registration-pending',
         context: {
-          name: user.name
+          name: user.name,
+          registrationType: registrationType,
+          amount: amount,
+          transactionId: transactionId
         }
       });
     } catch (emailError) {
-      console.error('Error sending welcome email:', emailError);
+      console.error('Error sending registration email:', emailError);
     }
 
-    sendTokenResponse(user, 201, res, 'Registration successful');
+    // Don't send token yet - user will login after admin verification
+    res.status(201).json({
+      success: true,
+      message: 'Registration submitted successfully. You will be notified via email after verification.',
+      data: {
+        email: user.email,
+        registrationType: user.registrationType,
+        amount: user.paymentAmount
+      }
+    });
   } catch (error) {
     res.status(400).json({
       success: false,

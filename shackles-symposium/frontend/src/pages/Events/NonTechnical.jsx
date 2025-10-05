@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import api from '../../services/api';
 import '../../styles/Technical.css';
 
 const NonTechnical = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [registeredEvents, setRegisteredEvents] = useState(new Set());
+  const [loading, setLoading] = useState(false);
+  const [registering, setRegistering] = useState(null);
+  const { isAuthenticated } = useAuth();
 
   const nonTechnicalEvents = [
     {
@@ -58,14 +64,81 @@ const NonTechnical = () => {
         phone: '+91 9361428799',
       },     prizes: '1st: ₹4000 | 2nd: ₹2500 | 3rd: ₹1500',
     },
+    {
+      id: 4,
+      name: 'New Non-Technical Event',
+      symbol: '○',
+      description: 'Exciting new event coming soon! Details to be announced.',
+      rules: [
+        'Event details coming soon',
+        'Check back for updates',
+        'Registration will open soon',
+      ],
+      coordinator: {
+        name: 'Event Team',
+        phone: '+91 9384583077',
+      },
+      prizes: 'To be announced',
+    },
   ];
+
+  // Fetch user's registered events on mount
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchRegisteredEvents();
+    }
+  }, [isAuthenticated]);
+
+  const fetchRegisteredEvents = async () => {
+    try {
+      const { data } = await api.get('/event-registrations/my-registrations');
+      const eventIds = new Set(data.data.map(reg => reg.event._id));
+      setRegisteredEvents(eventIds);
+    } catch (error) {
+      console.error('Error fetching registrations:', error);
+    }
+  };
+
+  const handleRegisterEvent = async (event, e) => {
+    e.stopPropagation();
+    
+    if (!isAuthenticated) {
+      alert('Please login to register for events');
+      return;
+    }
+
+    if (registeredEvents.has(event.id.toString())) {
+      alert('You are already registered for this event');
+      return;
+    }
+
+    setRegistering(event.id);
+    try {
+      const { data } = await api.post(`/event-registrations/${event.id}/register`, {
+        isTeamEvent: event.teamSize ? true : false,
+        teamMembers: []
+      });
+
+      alert(`Successfully registered for ${event.name}!`);
+      setRegisteredEvents(new Set([...registeredEvents, event.id.toString()]));
+    } catch (error) {
+      const message = error.response?.data?.message || 'Registration failed';
+      alert(message);
+    } finally {
+      setRegistering(null);
+    }
+  };
+
+  const isEventRegistered = (eventId) => {
+    return registeredEvents.has(eventId.toString());
+  };
 
   return (
     <div className="technical-events non-technical-page">
       <section className="technical-hero">
         <div className="hero-symbol non-tech-symbol">○</div>
         <h1 className="technical-title non-tech-title">Non-Technical Events</h1>
-        <p className="technical-subtitle">3 Fun-Filled Events for Everyone</p>
+        <p className="technical-subtitle">4 Fun-Filled Events for Everyone</p>
         <Link to="/events" className="btn-back">
           ← Back to Events
         </Link>
@@ -90,7 +163,24 @@ const NonTechnical = () => {
                     <p className="coordinator-phone">{event.coordinator.phone}</p>
                   </div>
                 </div>
-                <button className="btn-view-details btn-non-tech">View Details</button>
+                <div className="event-actions">
+                  <button className="btn-view-details btn-non-tech">View Details</button>
+                  {isAuthenticated && (
+                    <button 
+                      className={`btn-register-event ${isEventRegistered(event.id) ? 'registered' : ''}`}
+                      onClick={(e) => handleRegisterEvent(event, e)}
+                      disabled={registering === event.id || isEventRegistered(event.id)}
+                    >
+                      {registering === event.id ? 'Registering...' : 
+                       isEventRegistered(event.id) ? '✓ Registered' : 'Register Now'}
+                    </button>
+                  )}
+                  {!isAuthenticated && (
+                    <Link to="/login" className="btn-register-event" onClick={(e) => e.stopPropagation()}>
+                      Login to Register
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -131,9 +221,21 @@ const NonTechnical = () => {
               </div>
             </div>
 
-            <Link to="/register" className="btn-register-modal">
-              Register for this Event
-            </Link>
+            {isAuthenticated && (
+              <button 
+                className={`btn-register-modal ${isEventRegistered(selectedEvent.id) ? 'registered' : ''}`}
+                onClick={(e) => handleRegisterEvent(selectedEvent, e)}
+                disabled={registering === selectedEvent.id || isEventRegistered(selectedEvent.id)}
+              >
+                {registering === selectedEvent.id ? 'Registering...' : 
+                 isEventRegistered(selectedEvent.id) ? '✓ Already Registered' : 'Register for this Event'}
+              </button>
+            )}
+            {!isAuthenticated && (
+              <Link to="/login" className="btn-register-modal">
+                Login to Register
+              </Link>
+            )}
           </div>
         </div>
       )}

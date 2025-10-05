@@ -8,11 +8,13 @@ exports.getWorkshops = async (req, res) => {
   try {
     const workshops = await Workshop.find({ isActive: true })
       .populate('instructor', 'name email')
+      .populate('registrations')
       .sort('date');
 
     res.status(200).json({
       success: true,
       count: workshops.length,
+      workshops: workshops,
       data: workshops
     });
   } catch (error) {

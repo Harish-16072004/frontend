@@ -1,0 +1,396 @@
+================================================================================
+                    SHACKLES SYMPOSIUM - PROJECT STRUCTURE
+================================================================================
+Generated: October 5, 2025
+
+ROOT: shackles-symposium/
+│
+├── Documentation Files
+│   ├── BACKEND_COMPLETE.md
+│   ├── BACKEND_SETUP.md
+│   ├── BACKEND_STATUS.md
+│   ├── DATABASE_STRUCTURE.md
+│   ├── GIT_WORKFLOW.md
+│   ├── MONGODB_ATLAS_SETUP.md
+│   ├── MONGODB_QUICK_START.md
+│   ├── MONGODB_REFERENCE.md
+│   ├── QUICK_START.md
+│   ├── ADMIN_THEME_REDESIGN.md
+│   └── ADMIN_PAGES_THEME_STATUS.md
+│
+├── Scripts
+│   └── setup-mongodb.ps1
+│
+├── BACKEND/
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── .env
+│   ├── .gitignore
+│   │
+│   ├── src/
+│   │   ├── server.js
+│   │   │
+│   │   ├── config/
+│   │   │   ├── aws.js
+│   │   │   ├── database.js
+│   │   │   ├── email.js
+│   │   │   └── redis.js
+│   │   │
+│   │   ├── controllers/
+│   │   │   ├── adminController.js
+│   │   │   ├── attendanceController.js
+│   │   │   ├── authController.js
+│   │   │   ├── eventController.js
+│   │   │   ├── paymentController.js
+│   │   │   ├── registrationController.js
+│   │   │   ├── userController.js
+│   │   │   └── workshopController.js
+│   │   │
+│   │   ├── middleware/
+│   │   │   ├── auth.js
+│   │   │   ├── errorHandler.js
+│   │   │   ├── rateLimiter.js
+│   │   │   ├── upload.js
+│   │   │   └── validation.js
+│   │   │
+│   │   ├── models/
+│   │   │   ├── Attendance.js
+│   │   │   ├── Event.js
+│   │   │   ├── Payment.js
+│   │   │   ├── Registration.js
+│   │   │   ├── User.js
+│   │   │   └── Workshop.js
+│   │   │
+│   │   ├── routes/
+│   │   │   ├── adminRoutes.js
+│   │   │   ├── attendanceRoutes.js
+│   │   │   ├── authRoutes.js
+│   │   │   ├── eventRoutes.js
+│   │   │   ├── paymentRoutes.js
+│   │   │   ├── registrationRoutes.js
+│   │   │   ├── userRoutes.js
+│   │   │   └── workshopRoutes.js
+│   │   │
+│   │   ├── utils/
+│   │   │   ├── emailService.js
+│   │   │   ├── excelGenerator.js
+│   │   │   ├── googleSheets.js
+│   │   │   ├── pdfGenerator.js
+│   │   │   ├── qrGenerator.js
+│   │   │   └── s3Upload.js
+│   │   │
+│   │   └── validators/
+│   │       ├── authValidator.js
+│   │       ├── registrationValidator.js
+│   │       └── userValidator.js
+│   │
+│   └── node_modules/ (dependencies)
+│
+├── FRONTEND/
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── vite.config.js
+│   ├── index.html
+│   ├── .gitignore
+│   │
+│   ├── public/
+│   │   └── fonts/
+│   │       └── GameOfSquids.ttf
+│   │
+│   ├── src/
+│   │   ├── main.jsx
+│   │   ├── App.jsx
+│   │   ├── App.css
+│   │   ├── index.css
+│   │   │
+│   │   ├── assets/
+│   │   │   └── images/
+│   │   │       ├── about-icon.png
+│   │   │       └── member-avatar.png
+│   │   │
+│   │   ├── components/
+│   │   │   ├── PrivateRoute.jsx
+│   │   │   │
+│   │   │   └── common/
+│   │   │       ├── Header.jsx
+│   │   │       ├── Header.css
+│   │   │       ├── Footer.jsx
+│   │   │       ├── Footer.css
+│   │   │       ├── Loader.jsx
+│   │   │       └── Loader.css
+│   │   │
+│   │   ├── context/
+│   │   │   └── AuthContext.jsx
+│   │   │
+│   │   ├── hooks/
+│   │   │   ├── useApi.js
+│   │   │   └── useAuth.jsx
+│   │   │
+│   │   ├── services/
+│   │   │   └── api.js
+│   │   │
+│   │   ├── styles/
+│   │   │   ├── AdminDashboard.css (Squid Game Theme)
+│   │   │   └── variables.css
+│   │   │
+│   │   └── pages/
+│   │       │
+│   │       ├── Home.jsx
+│   │       ├── Home.css
+│   │       ├── Workshop.jsx
+│   │       ├── Workshop.css
+│   │       ├── Team.jsx
+│   │       ├── Team.css
+│   │       ├── Contact.jsx
+│   │       ├── Contact.css
+│   │       ├── Accommodation.jsx
+│   │       └── Accommodation.css
+│   │       │
+│   │       ├── Auth/
+│   │       │   ├── Login.jsx
+│   │       │   ├── Login.css
+│   │       │   ├── Register.jsx
+│   │       │   ├── Register.css
+│   │       │   ├── Profile.jsx
+│   │       │   └── Profile.css
+│   │       │
+│   │       ├── Events/
+│   │       │   ├── Technical.jsx
+│   │       │   ├── Technical.css
+│   │       │   ├── NonTechnical.jsx
+│   │       │   ├── NonTechnical.css
+│   │       │   ├── Special.jsx
+│   │       │   └── Special.css
+│   │       │
+│   │       └── Admin/
+│   │           ├── AdminDashboard.jsx (Squid Game Theme)
+│   │           ├── UserManagement.jsx
+│   │           ├── UserManagement.css (Squid Game Theme)
+│   │           ├── EventManagement.jsx
+│   │           ├── EventManagement.css (Squid Game Theme)
+│   │           ├── EventCheckIn.jsx
+│   │           ├── EventCheckIn.css (Squid Game Theme)
+│   │           ├── KitDistribution.jsx
+│   │           ├── KitDistribution.css (Squid Game Theme)
+│   │           ├── PaymentVerification.jsx
+│   │           └── PaymentVerification.css (Squid Game Theme)
+│   │
+│   └── node_modules/ (dependencies)
+│
+└── SERVER/
+    ├── package.json
+    ├── package-lock.json
+    ├── server.js
+    ├── test-connection.js
+    │
+    ├── config/
+    │   └── db.js
+    │
+    ├── models/
+    │   ├── Accommodation.js
+    │   ├── Event.js
+    │   ├── Registration.js
+    │   └── User.js
+    │
+    └── node_modules/ (dependencies)
+
+================================================================================
+                            KEY FEATURES & TECHNOLOGIES
+================================================================================
+
+BACKEND:
+  - Node.js + Express.js
+  - MongoDB with Mongoose ODM
+  - JWT Authentication
+  - Redis for caching
+  - AWS S3 for file storage
+  - Email service (Nodemailer)
+  - QR Code generation
+  - PDF/Excel generation
+  - Google Sheets integration
+  - Rate limiting & validation
+
+FRONTEND:
+  - React 18.2.0
+  - Vite 5.4.20
+  - React Router for navigation
+  - Axios for API calls
+  - Squid Game Theme (Dark mode with pink/cyan neon)
+  - Custom fonts: GameOfSquids, Orbitron, Rajdhani
+  - Responsive design
+  - Admin dashboard with complete theming
+
+ADMIN PAGES (Squid Game Theme):
+  ✅ AdminDashboard.css - Main dashboard with stats
+  ✅ UserManagement.css - User CRUD operations
+  ✅ EventManagement.css - Event/Workshop management
+  ✅ EventCheckIn.css - QR code scanning for check-ins
+  ✅ KitDistribution.css - Kit distribution tracking
+  ✅ PaymentVerification.css - Payment approval system
+
+THEME COLORS:
+  - Primary Pink: #E31B6C (Guard/Manager color)
+  - Primary Cyan: #0AD7A1 (Player color)
+  - Background: #0a0a0a to #1a0a14 gradients
+  - Text: White with glowing effects
+  - All borders: Sharp corners (no border-radius)
+
+FONTS:
+  - Titles: GameOfSquids (custom Squid Game font)
+  - Headings/Data: Orbitron (tech-inspired)
+  - Body text: Rajdhani (clean, modern)
+
+================================================================================
+                              DATABASE MODELS
+================================================================================
+
+User Model:
+  - Authentication (email, password, role)
+  - Personal info (name, college, year, branch, phone)
+  - ID card tracking
+  - Kit issuance status
+
+Event Model:
+  - Event details (name, description, category)
+  - Timing and venue
+  - Registration fees
+  - Participant limits
+  - Multiple rounds support
+
+Workshop Model:
+  - Workshop details
+  - Prerequisites
+  - Duration and schedule
+  - Registration management
+
+Registration Model:
+  - User-Event/Workshop linking
+  - Payment tracking
+  - Team management
+  - Status tracking
+
+Payment Model:
+  - Transaction tracking
+  - Screenshot storage (S3)
+  - Verification workflow
+  - Admin approval system
+
+Attendance Model:
+  - QR code scanning
+  - Check-in/check-out tracking
+  - Event association
+
+================================================================================
+                                API ENDPOINTS
+================================================================================
+
+AUTH ROUTES (/api/auth):
+  POST   /register          - User registration
+  POST   /login             - User login
+  GET    /profile           - Get user profile
+  PUT    /profile           - Update profile
+
+EVENT ROUTES (/api/events):
+  GET    /                  - Get all events
+  GET    /:id               - Get event by ID
+  POST   /                  - Create event (admin)
+  PUT    /:id               - Update event (admin)
+  DELETE /:id               - Delete event (admin)
+
+WORKSHOP ROUTES (/api/workshops):
+  GET    /                  - Get all workshops
+  GET    /:id               - Get workshop by ID
+  POST   /                  - Create workshop (admin)
+  PUT    /:id               - Update workshop (admin)
+  DELETE /:id               - Delete workshop (admin)
+
+REGISTRATION ROUTES (/api/registrations):
+  POST   /                  - Register for event/workshop
+  GET    /user              - Get user registrations
+  GET    /                  - Get all registrations (admin)
+
+PAYMENT ROUTES (/api/payments):
+  POST   /upload            - Upload payment proof
+  GET    /pending           - Get pending payments (admin)
+  PUT    /:id/verify        - Verify payment (admin)
+  PUT    /:id/reject        - Reject payment (admin)
+
+ADMIN ROUTES (/api/admin):
+  GET    /dashboard         - Dashboard statistics
+  GET    /users             - User management
+  GET    /events            - Event management
+  POST   /kit-distribution  - Kit distribution tracking
+
+ATTENDANCE ROUTES (/api/attendance):
+  POST   /check-in          - QR scan check-in
+  GET    /event/:id         - Event attendance report
+
+================================================================================
+                            DEVELOPMENT SETUP
+================================================================================
+
+PREREQUISITES:
+  - Node.js (v16+)
+  - MongoDB (local or Atlas)
+  - Redis (optional for caching)
+  - AWS Account (for S3 storage)
+
+BACKEND SETUP:
+  1. cd backend
+  2. npm install
+  3. Create .env file with required variables
+  4. npm run dev (starts on port 5000)
+
+FRONTEND SETUP:
+  1. cd frontend
+  2. npm install
+  3. npm run dev (starts on port 3000)
+
+ENVIRONMENT VARIABLES:
+  - MONGODB_URI
+  - JWT_SECRET
+  - AWS_ACCESS_KEY_ID
+  - AWS_SECRET_ACCESS_KEY
+  - AWS_REGION
+  - AWS_S3_BUCKET
+  - EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASS
+  - REDIS_HOST, REDIS_PORT (optional)
+
+================================================================================
+                              PROJECT STATUS
+================================================================================
+
+COMPLETED:
+  ✅ Backend API with all routes
+  ✅ MongoDB models and schemas
+  ✅ JWT Authentication
+  ✅ File upload to AWS S3
+  ✅ QR code generation
+  ✅ Email service integration
+  ✅ Frontend React application
+  ✅ Admin dashboard (Squid Game theme)
+  ✅ All 6 admin pages themed consistently
+  ✅ User management system
+  ✅ Event/Workshop management
+  ✅ Payment verification system
+  ✅ Kit distribution tracking
+  ✅ Event check-in system
+
+ADMIN THEME REDESIGN:
+  ✅ Font size fixes (1.8rem → 2.2rem for values)
+  ✅ Dark gradient backgrounds
+  ✅ Pink/Cyan neon color scheme
+  ✅ Glowing effects on all elements
+  ✅ Sharp corners (no border-radius)
+  ✅ Shimmer animations
+  ✅ Custom font hierarchy
+  ✅ Consistent styling across all pages
+
+IN PROGRESS:
+  - Testing and bug fixes
+  - Performance optimization
+  - Mobile responsiveness refinement
+
+================================================================================
+                              END OF STRUCTURE
+================================================================================

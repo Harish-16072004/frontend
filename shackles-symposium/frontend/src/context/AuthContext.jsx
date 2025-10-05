@@ -17,7 +17,8 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       try {
         const { data } = await api.get('/auth/me');
-        setUser(data.user);
+        // Backend returns user in data.data
+        setUser(data.data);
         setIsAuthenticated(true);
       } catch (error) {
         localStorage.removeItem('token');
@@ -28,16 +29,35 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (email, password) => {
-    const { data } = await api.post('/auth/login', { email, password });
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('refreshToken', data.refreshToken);
-    setUser(data.user);
-    setIsAuthenticated(true);
-    return data;
+    try {
+      const { data } = await api.post('/auth/login', { email, password });
+      console.log('Login response:', data);
+      
+      if (!data.success) {
+        throw new Error(data.message || 'Login failed');
+      }
+      
+      localStorage.setItem('token', data.token);
+      if (data.refreshToken) {
+        localStorage.setItem('refreshToken', data.refreshToken);
+      }
+      // Backend returns user data in data.data
+      setUser(data.data);
+      setIsAuthenticated(true);
+      return data;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   };
 
   const register = async (userData) => {
-    const { data } = await api.post('/auth/register', userData);
+    // If userData is FormData, let axios set the content-type automatically
+    const config = userData instanceof FormData 
+      ? { headers: { 'Content-Type': 'multipart/form-data' } }
+      : {};
+    
+    const { data } = await api.post('/auth/register', userData, config);
     return data;
   };
 

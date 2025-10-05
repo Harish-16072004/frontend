@@ -608,6 +608,258 @@
   text-shadow: 0 0 15px rgba(255, 193, 7, 0.5);
 }
 
+/* Registration Type Section */
+.registration-type-section {
+  margin-bottom: 2rem;
+}
+
+.registration-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.registration-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem;
+  border: 2px solid rgba(10, 215, 161, 0.3);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.registration-btn:hover {
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 4px 15px rgba(10, 215, 161, 0.3),
+    0 0 25px rgba(10, 215, 161, 0.2);
+  background: rgba(0, 0, 0, 0.7);
+  transform: translateY(-3px);
+}
+
+.registration-btn.active {
+  border-color: rgba(255, 255, 255, 0.8);
+  background: linear-gradient(135deg, rgba(10, 215, 161, 0.2), rgba(227, 27, 108, 0.2));
+  box-shadow: 
+    0 4px 20px rgba(10, 215, 161, 0.4),
+    0 0 40px rgba(10, 215, 161, 0.3),
+    inset 0 0 30px rgba(10, 215, 161, 0.1);
+  transform: scale(1.05);
+}
+
+.btn-icon {
+  font-size: 2rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-text {
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.btn-price {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 0 15px rgba(10, 215, 161, 0.4);
+}
+
+.amount-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, rgba(10, 215, 161, 0.15), rgba(227, 27, 108, 0.15));
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  margin-top: 1.5rem;
+  box-shadow: 
+    0 0 30px rgba(10, 215, 161, 0.2),
+    inset 0 0 30px rgba(10, 215, 161, 0.1);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.amount-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+}
+
+.amount-value {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 0 20px rgba(10, 215, 161, 0.5);
+}
+
+/* QR Code Section */
+.qr-section {
+  margin-bottom: 2rem;
+}
+
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(10, 215, 161, 0.3);
+  border-radius: 12px;
+  margin-top: 1rem;
+}
+
+.qr-image {
+  width: 300px;
+  height: 300px;
+  max-width: 100%;
+  border-radius: 8px;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 0 30px rgba(10, 215, 161, 0.3),
+    0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.qr-hint {
+  margin-top: 1rem;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+
+.qr-info {
+  margin-top: 1rem;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  text-shadow: 0 0 10px rgba(10, 215, 161, 0.3);
+}
+
+.payment-details-section {
+  margin-bottom: 2rem;
+}
+
+/* Success Card */
+.success-card {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.success-icon {
+  font-size: 5rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1.5rem;
+  animation: scaleIn 0.5s ease-out;
+  text-shadow: 0 0 40px rgba(10, 215, 161, 0.6);
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.success-title {
+  font-family: 'GameOfSquids', 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 30px rgba(10, 215, 161, 0.5);
+}
+
+.success-message {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.success-details {
+  background: linear-gradient(135deg, rgba(10, 215, 161, 0.15), rgba(227, 27, 108, 0.15));
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 2rem auto;
+  max-width: 500px;
+  text-align: left;
+}
+
+.success-details p {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.success-details p:last-child {
+  margin-bottom: 0;
+}
+
+.success-details strong {
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.back-home-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2.5rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), #08b88a);
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 
+    0 4px 15px rgba(10, 215, 161, 0.4),
+    0 0 30px rgba(10, 215, 161, 0.2);
+}
+
+.back-home-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 25px rgba(10, 215, 161, 0.5),
+    0 0 40px rgba(10, 215, 161, 0.3);
+  background: linear-gradient(135deg, #0ae7a9, rgba(255, 255, 255, 0.8));
+}
+
 @media (max-width: 768px) {
   .register-card {
     padding: 2rem 1.5rem;
@@ -638,6 +890,23 @@
   .submit-btn {
     width: 100%;
   }
+
+  .registration-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .qr-image {
+    width: 250px;
+    height: 250px;
+  }
+
+  .success-title {
+    font-size: 2rem;
+  }
+
+  .success-card {
+    padding: 2rem 1rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -653,6 +922,24 @@
     flex-direction: column;
     gap: 0.5rem;
     text-align: center;
+  }
+
+  .qr-image {
+    width: 200px;
+    height: 200px;
+  }
+
+  .success-icon {
+    font-size: 3.5rem;
+  }
+
+  .success-title {
+    font-size: 1.75rem;
+  }
+
+  .amount-display {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }
 

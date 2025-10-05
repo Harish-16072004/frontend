@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import '../styles/Home.css';
-import aboutIcon from '../assets/images/about-icon.png';
 
 function Home() {
   const [timeLeft, setTimeLeft] = useState({
@@ -268,7 +267,7 @@ function Home() {
           {/* Institution */}
           <div className="organizer-card">
             <div className="organizer-icon">
-              <img src={aboutIcon} alt="Institution" className="organizer-img" />
+              <div className="about-icon">■</div>
             </div>
             <h3>Alagappa Chettiar Government College of Engineering and Technology</h3>
             <p>
@@ -282,7 +281,7 @@ function Home() {
           {/* Department */}
           <div className="organizer-card">
             <div className="organizer-icon">
-              <img src={aboutIcon} alt="Department" className="organizer-img" />
+              <div className="about-icon">○</div>
             </div>
             <h3>Department of Mechanical Engineering</h3>
             <p>
@@ -296,7 +295,7 @@ function Home() {
           {/* SHACKLES */}
           <div className="organizer-card">
             <div className="organizer-icon">
-              <img src={aboutIcon} alt="SHACKLES" className="organizer-img" />
+              <div className="about-icon">△</div>
             </div>
             <h3>SHACKLES 25-26: The Ultimate Test</h3>
             <p>

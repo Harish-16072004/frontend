@@ -2,6 +2,12 @@ const nodemailer = require('nodemailer');
 
 // Create reusable transporter
 const createTransporter = () => {
+  // Check if email is configured
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+    console.log('ℹ️  Email not configured - skipping email sending');
+    return null;
+  }
+
   if (process.env.EMAIL_SERVICE === 'gmail') {
     return nodemailer.createTransporter({
       service: 'gmail',

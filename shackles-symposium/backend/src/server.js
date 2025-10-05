@@ -65,11 +65,13 @@ app.get('/health', (req, res) => {
 app.use('/api/v1/auth', require('./routes/authRoutes'));
 app.use('/api/v1/users', require('./routes/userRoutes'));
 app.use('/api/v1/events', require('./routes/eventRoutes'));
+app.use('/api/v1/event-registrations', require('./routes/eventRegistrationRoutes'));
 app.use('/api/v1/workshops', require('./routes/workshopRoutes'));
 app.use('/api/v1/registrations', require('./routes/registrationRoutes'));
 app.use('/api/v1/payments', require('./routes/paymentRoutes'));
 app.use('/api/v1/admin', require('./routes/adminRoutes'));
 app.use('/api/v1/attendance', require('./routes/attendanceRoutes'));
+app.use('/api/v1/qr-scan', require('./routes/qrScanRoutes'));
 
 // Root route
 app.get('/', (req, res) => {
@@ -86,7 +88,8 @@ app.get('/', (req, res) => {
       registrations: '/api/v1/registrations',
       payments: '/api/v1/payments',
       admin: '/api/v1/admin',
-      attendance: '/api/v1/attendance'
+      attendance: '/api/v1/attendance',
+      qrScan: '/api/v1/qr-scan'
     }
   });
 });

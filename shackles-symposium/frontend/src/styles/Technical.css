@@ -420,6 +420,69 @@
   box-shadow: 0 10px 40px rgba(10, 215, 161, 0.6);
 }
 
+/* Event Actions */
+.event-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.btn-register-event {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(135deg, #e31b6c, #ff4d94);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(227, 27, 108, 0.4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.btn-register-event:hover {
+  background: linear-gradient(135deg, #ff4d94, #e31b6c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(227, 27, 108, 0.6);
+}
+
+.btn-register-event:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-register-event.registered {
+  background: linear-gradient(135deg, #0ad7a1, #08b587);
+  box-shadow: 0 4px 15px rgba(10, 215, 161, 0.4);
+}
+
+.btn-register-event.registered:hover {
+  background: linear-gradient(135deg, #08b587, #0ad7a1);
+  box-shadow: 0 6px 20px rgba(10, 215, 161, 0.6);
+}
+
+.btn-register-modal.registered {
+  background: linear-gradient(135deg, #0ad7a1, #08b587);
+  box-shadow: 0 4px 20px rgba(10, 215, 161, 0.4);
+  cursor: default;
+}
+
+.btn-register-modal.registered:hover {
+  background: linear-gradient(135deg, #08b587, #0ad7a1);
+  transform: translateY(-2px);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .container {
@@ -441,6 +504,16 @@
 
   .hero-symbol {
     font-size: 6rem;
+  }
+
+  .event-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-view-details,
+  .btn-register-event {
+    width: 100%;
   }
 }
 

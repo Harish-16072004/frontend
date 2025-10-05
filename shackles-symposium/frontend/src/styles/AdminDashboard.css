@@ -1,112 +1,247 @@
+/* ===================================
+   ADMIN DASHBOARD - SQUID GAME THEME
+   =================================== */
+
 .admin-dashboard {
   min-height: calc(100vh - 80px);
   padding: 2rem 1rem;
-  background: #f5f7fa;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a0a14 50%, #0a0a0a 100%);
+  position: relative;
+}
+
+/* Animated Background Pattern */
+.admin-dashboard::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(227, 27, 108, 0.03) 50px, rgba(227, 27, 108, 0.03) 100px),
+    repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(10, 215, 161, 0.03) 50px, rgba(10, 215, 161, 0.03) 100px);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .dashboard-container {
   max-width: 1400px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
+/* Squid Game Header */
 .dashboard-header {
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
+  text-align: center;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(227, 27, 108, 0.3);
+  border-radius: 0;
+  clip-path: polygon(2% 0%, 98% 0%, 100% 15%, 100% 85%, 98% 100%, 2% 100%, 0% 85%, 0% 15%);
+  box-shadow: 
+    0 0 30px rgba(227, 27, 108, 0.3),
+    inset 0 0 30px rgba(227, 27, 108, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(227, 27, 108, 0.2), transparent);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  100% { left: 100%; }
 }
 
 .dashboard-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: clamp(2rem, 5vw, 2.5rem);
-  color: var(--guard-pink);
+  font-family: 'GameOfSquids', 'Orbitron', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  color: #E31B6C;
   margin-bottom: 0.5rem;
+  text-shadow: 
+    0 0 20px rgba(227, 27, 108, 0.8),
+    0 0 40px rgba(227, 27, 108, 0.5),
+    0 0 60px rgba(227, 27, 108, 0.3);
+  letter-spacing: 0.3rem;
+  text-transform: uppercase;
 }
 
 .dashboard-subtitle {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-  font-weight: 600;
+  font-size: 1.3rem;
+  color: #0AD7A1;
+  font-weight: 700;
+  letter-spacing: 0.2rem;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(10, 215, 161, 0.5);
 }
 
+/* Squid Game Stat Cards */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
   margin-bottom: 3rem;
 }
 
 .stat-card {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid rgba(227, 27, 108, 0.3);
+  border-radius: 0;
+  padding: 2rem 1.5rem;
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 
+    0 4px 20px rgba(227, 27, 108, 0.2),
+    inset 0 0 20px rgba(227, 27, 108, 0.05);
   transition: all 0.3s ease;
-  border-left: 4px solid;
+  position: relative;
+  overflow: hidden;
+  min-height: 130px;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(227, 27, 108, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.stat-card:hover::before {
+  left: 100%;
 }
 
 .stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-8px);
+  border-color: rgba(227, 27, 108, 0.8);
+  box-shadow: 
+    0 8px 30px rgba(227, 27, 108, 0.4),
+    inset 0 0 30px rgba(227, 27, 108, 0.1);
 }
 
 .stat-card.registrations {
-  border-color: var(--player-green);
+  border-color: rgba(10, 215, 161, 0.5);
+  box-shadow: 
+    0 4px 20px rgba(10, 215, 161, 0.2),
+    inset 0 0 20px rgba(10, 215, 161, 0.05);
+}
+
+.stat-card.registrations:hover {
+  border-color: rgba(10, 215, 161, 0.9);
+  box-shadow: 
+    0 8px 30px rgba(10, 215, 161, 0.4),
+    inset 0 0 30px rgba(10, 215, 161, 0.1);
 }
 
 .stat-card.verified {
-  border-color: #4CAF50;
+  border-color: rgba(76, 175, 80, 0.5);
+  box-shadow: 
+    0 4px 20px rgba(76, 175, 80, 0.2),
+    inset 0 0 20px rgba(76, 175, 80, 0.05);
+}
+
+.stat-card.verified:hover {
+  border-color: rgba(76, 175, 80, 0.9);
+  box-shadow: 
+    0 8px 30px rgba(76, 175, 80, 0.4),
+    inset 0 0 30px rgba(76, 175, 80, 0.1);
 }
 
 .stat-card.pending {
-  border-color: var(--vip-gold);
+  border-color: rgba(255, 193, 7, 0.5);
+  box-shadow: 
+    0 4px 20px rgba(255, 193, 7, 0.2),
+    inset 0 0 20px rgba(255, 193, 7, 0.05);
+}
+
+.stat-card.pending:hover {
+  border-color: rgba(255, 193, 7, 0.9);
+  box-shadow: 
+    0 8px 30px rgba(255, 193, 7, 0.4),
+    inset 0 0 30px rgba(255, 193, 7, 0.1);
 }
 
 .stat-card.revenue {
-  border-color: var(--guard-pink);
+  border-color: rgba(227, 27, 108, 0.5);
+}
+
+.stat-card.revenue:hover {
+  border-color: rgba(227, 27, 108, 0.9);
 }
 
 .stat-icon {
-  font-size: 2.5rem;
+  font-size: 3.5rem;
+  filter: drop-shadow(0 0 10px currentColor);
+  flex-shrink: 0;
 }
 
 .stat-content {
   flex: 1;
+  min-width: 0;
 }
 
 .stat-label {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  font-weight: 600;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.5px;
   margin-bottom: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stat-value {
   font-family: 'Orbitron', sans-serif;
-  font-size: 1.8rem;
+  font-size: 2.2rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #ffffff;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+  line-height: 1;
 }
 
+/* Squid Game Quick Actions */
 .quick-actions,
 .event-stats,
 .recent-registrations {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid rgba(10, 215, 161, 0.3);
+  border-radius: 0;
+  padding: 2.5rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 
+    0 4px 20px rgba(10, 215, 161, 0.2),
+    inset 0 0 20px rgba(10, 215, 161, 0.05);
+  position: relative;
 }
 
 .section-title {
   font-family: 'Orbitron', sans-serif;
-  font-size: 1.5rem;
-  color: var(--text-primary);
-  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  color: #0AD7A1;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2rem;
+  text-shadow: 0 0 15px rgba(10, 215, 161, 0.6);
+  border-bottom: 2px solid rgba(10, 215, 161, 0.3);
+  padding-bottom: 1rem;
 }
 
 .actions-grid {
@@ -121,31 +256,57 @@
   align-items: center;
   gap: 1rem;
   padding: 2rem 1rem;
-  background: linear-gradient(135deg, rgba(10, 215, 161, 0.05), rgba(227, 27, 108, 0.05));
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(227, 27, 108, 0.3);
+  border-radius: 0;
   text-decoration: none;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(227, 27, 108, 0.1), rgba(10, 215, 161, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.action-card:hover::before {
+  opacity: 1;
 }
 
 .action-card:hover {
-  border-color: var(--player-green);
-  transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(10, 215, 161, 0.15);
+  border-color: rgba(227, 27, 108, 0.8);
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 
+    0 10px 30px rgba(227, 27, 108, 0.4),
+    inset 0 0 30px rgba(227, 27, 108, 0.1);
 }
 
 .action-icon {
-  font-size: 3rem;
+  font-size: 3.5rem;
+  filter: drop-shadow(0 0 15px currentColor);
+  z-index: 1;
 }
 
 .action-label {
   font-family: 'Rajdhani', sans-serif;
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #ffffff;
   text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  z-index: 1;
 }
 
+/* Squid Game Events Chart */
 .events-chart {
   display: flex;
   flex-direction: column;
@@ -160,109 +321,175 @@
 
 .event-name {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .bar-container {
   width: 100%;
-  height: 32px;
-  background: #f0f0f0;
-  border-radius: 8px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(227, 27, 108, 0.3);
+  border-radius: 0;
   overflow: hidden;
   position: relative;
 }
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--player-green), var(--guard-pink));
+  background: linear-gradient(90deg, #E31B6C, #0AD7A1);
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-right: 0.75rem;
-  transition: width 0.5s ease;
-  min-width: 50px;
+  padding-right: 1rem;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 60px;
+  box-shadow: 
+    0 0 20px rgba(227, 27, 108, 0.5),
+    inset 0 0 20px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.bar-fill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
 }
 
 .bar-value {
   font-family: 'Orbitron', sans-serif;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 700;
   color: white;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  z-index: 1;
+  position: relative;
 }
 
+/* Squid Game Table */
 .table-container {
   overflow-x: auto;
   margin-bottom: 1rem;
+  border: 1px solid rgba(227, 27, 108, 0.3);
+  border-radius: 0;
 }
 
 .registrations-table {
   width: 100%;
   border-collapse: collapse;
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .registrations-table thead {
-  background: #f5f7fa;
+  background: rgba(227, 27, 108, 0.2);
+  border-bottom: 2px solid rgba(227, 27, 108, 0.5);
 }
 
 .registrations-table th {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #ffffff;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 1rem;
+  letter-spacing: 1px;
+  padding: 1.2rem 1rem;
   text-align: left;
+  border-right: 1px solid rgba(227, 27, 108, 0.2);
+}
+
+.registrations-table th:last-child {
+  border-right: none;
 }
 
 .registrations-table td {
   font-family: 'Rajdhani', sans-serif;
   font-size: 1rem;
-  color: var(--text-primary);
+  color: rgba(255, 255, 255, 0.9);
   padding: 1rem;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid rgba(227, 27, 108, 0.2);
+  border-right: 1px solid rgba(227, 27, 108, 0.1);
+}
+
+.registrations-table td:last-child {
+  border-right: none;
+}
+
+.registrations-table tbody tr {
+  transition: all 0.3s ease;
+}
+
+.registrations-table tbody tr:hover {
+  background: rgba(227, 27, 108, 0.1);
 }
 
 .reg-id {
   font-family: 'Orbitron', sans-serif;
-  font-weight: 600;
-  color: var(--player-green);
+  font-weight: 700;
+  color: #0AD7A1;
+  text-shadow: 0 0 10px rgba(10, 215, 161, 0.5);
 }
 
 .status-badge {
   display: inline-block;
-  padding: 0.375rem 0.75rem;
-  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  border-radius: 0;
   font-size: 0.85rem;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 1px solid;
 }
 
 .status-badge.verified {
-  background: rgba(76, 175, 80, 0.1);
+  background: rgba(76, 175, 80, 0.2);
   color: #4CAF50;
+  border-color: #4CAF50;
+  text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
 }
 
 .status-badge.pending {
-  background: rgba(255, 191, 0, 0.1);
-  color: var(--vip-gold);
+  background: rgba(255, 193, 7, 0.2);
+  color: #FFC107;
+  border-color: #FFC107;
+  text-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
 }
 
 .view-all-link {
   display: inline-block;
   font-family: 'Rajdhani', sans-serif;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: var(--player-green);
+  color: #0AD7A1;
   text-decoration: none;
-  transition: color 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #0AD7A1;
+  transition: all 0.3s ease;
 }
 
 .view-all-link:hover {
-  color: var(--guard-pink);
+  background: #0AD7A1;
+  color: #000000;
+  box-shadow: 0 0 20px rgba(10, 215, 161, 0.5);
+  transform: translateY(-2px);
 }
 
+/* Responsive Design */
 @media (max-width: 768px) {
   .stats-grid {
     grid-template-columns: 1fr;
@@ -270,6 +497,14 @@
 
   .actions-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-title {
+    font-size: 2rem;
+  }
+
+  .stat-value {
+    font-size: 1.8rem;
   }
 
   .registrations-table {
@@ -285,5 +520,13 @@
 @media (max-width: 480px) {
   .actions-grid {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-header {
+    padding: 1.5rem;
+  }
+
+  .stat-icon {
+    font-size: 2.5rem;
   }
 }

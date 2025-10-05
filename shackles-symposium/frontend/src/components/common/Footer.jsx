@@ -30,11 +30,17 @@ const Footer = () => {
           <div className="contact-info">
             <p>
               <strong>General Queries:</strong><br />
-              Killivalavan S: <a href="tel:+919514585887">+91 9514585887</a>
+              Killivalavan S: <a href="tel:+916382853181">+91 6382853181</a><br />
+              Abirami N: <a href="tel:+916369234314">+91 6369234314</a>
             </p>
             <p>
-              <strong>Registration Support:</strong><br />
-              Abirami N: <a href="tel:+919384583077">+91 9384583077</a>
+              <strong>Event Queries:</strong><br />
+              Sakthivel K: <a href="tel:+919342034079">+91 9342034079</a><br />
+              Prabuvelsundar S R: <a href="tel:+919600463229">+91 9600463229</a>
+            </p>
+            <p>
+              <strong>Registration Queries:</strong><br />
+              Harish J: <a href="tel:+917305432775">+91 7305432775</a>
             </p>
             <p>
               <strong>Email:</strong><br />
@@ -57,7 +63,7 @@ const Footer = () => {
               </svg>
             </a>
             <a 
-              href="https://www.linkedin.com/company/mechanical-engineering-association-acgcet" 
+              href="https://www.linkedin.com/company/mechanical-engineering-association-of-acgcet" 
               target="_blank" 
               rel="noopener noreferrer"
               aria-label="LinkedIn"
@@ -75,11 +81,7 @@ const Footer = () => {
 
       <div className="footer-bottom">
         <div className="footer-container">
-          <p>&copy; 2025 SHACKLES. All rights reserved.</p>
-          <p>
-            Mechanical Engineering Association<br />
-            Alagappa Chettiar Government College of Engineering & Technology
-          </p>
+          <p>&copy; 2025 MECHANICAL ENGINEERING ASSOCIATION. All rights reserved.</p>
         </div>
       </div>
     </footer>

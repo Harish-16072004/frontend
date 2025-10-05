@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import Loader from '../../components/common/Loader';
 import '../../styles/AdminDashboard.css';
 
@@ -10,43 +11,86 @@ const AdminDashboard = () => {
     verifiedPayments: 0,
     pendingPayments: 0,
     totalRevenue: 0,
+    generalOnly: 0,
+    workshopOnly: 0,
+    both: 0,
+    kitsIssued: 0,
     eventWiseRegistrations: [],
     recentRegistrations: []
   });
 
   useEffect(() => {
-    // Fetch dashboard data
-    const fetchStats = async () => {
-      try {
-        // Mock data - replace with actual API call
-        setStats({
-          totalRegistrations: 247,
-          verifiedPayments: 198,
-          pendingPayments: 49,
-          totalRevenue: 148506,
-          eventWiseRegistrations: [
-            { name: 'Paper Presentation', count: 45 },
-            { name: 'Technical Quiz', count: 52 },
-            { name: 'CAD Modelling', count: 38 },
-            { name: 'Water Rocketry', count: 31 },
-            { name: 'IPL Auction', count: 64 },
-            { name: 'Idea Pitching', count: 27 }
-          ],
-          recentRegistrations: [
-            { id: 'SHACKLES2025-0245', name: 'Rajesh Kumar', college: 'Anna University', date: '2025-10-01', status: 'verified' },
-            { id: 'SHACKLES2025-0246', name: 'Priya Sharma', college: 'MIT Chennai', date: '2025-10-01', status: 'pending' },
-            { id: 'SHACKLES2025-0247', name: 'Amit Patel', college: 'PSG Tech', date: '2025-10-02', status: 'verified' }
-          ]
-        });
-      } catch (error) {
-        console.error('Failed to fetch stats:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStats();
   }, []);
+
+  const fetchStats = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Fetch users data
+      const usersResponse = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/users`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      const users = usersResponse.data.users || [];
+      
+      // Fetch events data
+      const eventsResponse = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/v1/events`
+      );
+      
+      const events = eventsResponse.data.events || [];
+      
+      // Calculate stats from real data
+      const totalUsers = users.length;
+      const verifiedUsers = users.filter(u => u.paymentStatus === 'verified').length;
+      const pendingUsers = users.filter(u => u.paymentStatus === 'pending').length;
+      const totalRevenue = users
+        .filter(u => u.paymentStatus === 'verified')
+        .reduce((sum, u) => sum + (u.paymentAmount || 0), 0);
+      
+      const generalOnly = users.filter(u => u.registrationType === 'general').length;
+      const workshopOnly = users.filter(u => u.registrationType === 'workshop').length;
+      const both = users.filter(u => u.registrationType === 'both').length;
+      const kitsIssued = users.filter(u => u.participantId).length;
+      
+      // Get recent registrations (last 10)
+      const recentUsers = users
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 10)
+        .map(user => ({
+          id: user.participantId || 'Pending',
+          name: user.name,
+          college: user.college,
+          date: user.createdAt,
+          status: user.paymentStatus
+        }));
+      
+      // Event-wise registrations (from events data)
+      const eventWiseRegistrations = events.map(event => ({
+        name: event.name,
+        count: event.registrations?.length || 0
+      })).slice(0, 6); // Top 6 events
+      
+      setStats({
+        totalRegistrations: totalUsers,
+        verifiedPayments: verifiedUsers,
+        pendingPayments: pendingUsers,
+        totalRevenue: totalRevenue,
+        generalOnly,
+        workshopOnly,
+        both,
+        kitsIssued,
+        eventWiseRegistrations,
+        recentRegistrations: recentUsers
+      });
+    } catch (error) {
+      console.error('Failed to fetch stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return <Loader />;
@@ -95,6 +139,41 @@ const AdminDashboard = () => {
           </div>
         </div>
 
+        {/* Registration Type Stats */}
+        <div className="stats-grid" style={{ marginTop: '20px' }}>
+          <div className="stat-card" style={{ borderLeft: '4px solid #3498db' }}>
+            <div className="stat-icon">🎯</div>
+            <div className="stat-content">
+              <h3 className="stat-label">General Only</h3>
+              <p className="stat-value">{stats.generalOnly}</p>
+            </div>
+          </div>
+
+          <div className="stat-card" style={{ borderLeft: '4px solid #f39c12' }}>
+            <div className="stat-icon">🛠️</div>
+            <div className="stat-content">
+              <h3 className="stat-label">Workshop Only</h3>
+              <p className="stat-value">{stats.workshopOnly}</p>
+            </div>
+          </div>
+
+          <div className="stat-card" style={{ borderLeft: '4px solid #e74c3c' }}>
+            <div className="stat-icon">⭐</div>
+            <div className="stat-content">
+              <h3 className="stat-label">Both</h3>
+              <p className="stat-value">{stats.both}</p>
+            </div>
+          </div>
+
+          <div className="stat-card" style={{ borderLeft: '4px solid #1abc9c' }}>
+            <div className="stat-icon">📦</div>
+            <div className="stat-content">
+              <h3 className="stat-label">Kits Issued</h3>
+              <p className="stat-value">{stats.kitsIssued}</p>
+            </div>
+          </div>
+        </div>
+
         {/* Quick Actions */}
         <div className="quick-actions">
           <h2 className="section-title">Quick Actions</h2>
@@ -111,9 +190,13 @@ const AdminDashboard = () => {
               <span className="action-icon">💳</span>
               <span className="action-label">Verify Payments</span>
             </Link>
-            <Link to="/admin/qr-scanner" className="action-card">
+            <Link to="/admin/scanner" className="action-card">
               <span className="action-icon">📷</span>
-              <span className="action-label">Scan QR Codes</span>
+              <span className="action-label">QR Scanner</span>
+            </Link>
+            <Link to="/admin/kit-distribution" className="action-card">
+              <span className="action-icon">🎒</span>
+              <span className="action-label">Kit Distribution</span>
             </Link>
           </div>
         </div>

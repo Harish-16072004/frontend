@@ -2,6 +2,11 @@ const nodemailer = require('nodemailer');
 
 // Create transporter
 const createTransporter = () => {
+  // Check if email is configured
+  if (!process.env.EMAIL_HOST || !process.env.EMAIL_PASSWORD) {
+    return null;
+  }
+
   return nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: process.env.EMAIL_PORT,
@@ -17,6 +22,12 @@ const createTransporter = () => {
 exports.sendEmail = async (options) => {
   try {
     const transporter = createTransporter();
+    
+    // If email is not configured, skip sending
+    if (!transporter) {
+      console.log('ℹ️  Email not configured - skipping email to:', options.email);
+      return { skipped: true };
+    }
 
     const message = {
       from: `${process.env.EMAIL_FROM_NAME} <${process.env.EMAIL_FROM}>`,
@@ -26,11 +37,12 @@ exports.sendEmail = async (options) => {
     };
 
     const info = await transporter.sendMail(message);
-    console.log('Email sent: %s', info.messageId);
+    console.log('✅ Email sent successfully:', info.messageId);
     return info;
   } catch (error) {
-    console.error('Email send error:', error);
-    throw error;
+    console.error('❌ Email send error:', error.message);
+    // Don't throw error - just log it so registration can continue
+    return { error: error.message };
   }
 };
 

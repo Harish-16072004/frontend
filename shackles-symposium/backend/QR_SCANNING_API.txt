@@ -1,0 +1,660 @@
+# QR Code Scanning API - Complete Guide
+
+## 🎯 Overview
+
+Complete QR code scanning system with:
+- **Access Control**: Registration type validation
+- **Attendance Tracking**: Event check-in/check-out
+- **Kit Distribution**: Registration kit issuance
+- **Real-time Validation**: Instant QR verification
+
+---
+
+## 🔐 Access Control Rules
+
+### Registration Types:
+
+| Registration Type | Can Access | Cannot Access |
+|-------------------|------------|---------------|
+| **`general`** | ✅ Technical Events<br>✅ Non-Technical Events<br>✅ Special Events | ❌ Workshops |
+| **`workshop`** | ✅ Workshops Only | ❌ Technical Events<br>❌ Non-Technical Events<br>❌ Special Events |
+| **`both`** | ✅ **ALL EVENTS**<br>✅ Technical Events<br>✅ Non-Technical Events<br>✅ Special Events<br>✅ Workshops | ✅ Full Access |
+
+### Example Scenarios:
+
+#### ❌ **ACCESS DENIED** Examples:
+```
+Workshop Registration (SHWK001) → Paper Presentation (technical event)
+❌ ACCESS DENIED: You are registered only for WORKSHOPS
+
+General Registration (SHEN001) → CAD Workshop (workshop)
+❌ ACCESS DENIED: You are registered only for GENERAL EVENTS
+```
+
+#### ✅ **ACCESS GRANTED** Examples:
+```
+General Registration (SHEN001) → Paper Presentation (technical event)
+✅ ACCESS GRANTED
+
+Workshop Registration (SHWK001) → 3D Printing Workshop (workshop)
+✅ ACCESS GRANTED
+
+Both Registration (SHGN001) → ANY EVENT or WORKSHOP
+✅ FULL ACCESS GRANTED
+```
+
+---
+
+## 📡 API Endpoints
+
+### Base URL
+```
+http://localhost:5000/api/v1/qr-scan
+```
+
+### Authentication
+All endpoints require authentication token:
+```
+Authorization: Bearer <jwt_token>
+```
+
+Roles allowed: `admin`, `coordinator`
+
+---
+
+## 1️⃣ Scan QR Code (Validation Only)
+
+### `POST /scan-qr`
+
+Validates QR code and checks access permissions WITHOUT creating attendance record.
+
+#### Request Body:
+```json
+{
+  "qrData": "{\"participantId\":\"SHEN001\",\"name\":\"Harish J\",\"email\":\"harish@acgcet.edu\",\"registrationType\":\"general\"}",
+  "eventId": "60d5f9e4c8b1234567890abc",
+  "eventType": "event"
+}
+```
+
+#### Parameters:
+- `qrData` (string, required): JSON string from QR code
+- `eventId` (string, required): MongoDB ObjectId of event/workshop
+- `eventType` (string, optional): `"event"` or `"workshop"` (default: `"event"`)
+
+#### Success Response (200):
+```json
+{
+  "success": true,
+  "message": "✅ QR Code validated successfully",
+  "participant": {
+    "id": "SHEN001",
+    "fullName": "Harish J",
+    "email": "harish@acgcet.edu",
+    "college": "ACGCET",
+    "department": "Mechanical Engineering",
+    "phone": "9876543210",
+    "registrationType": "general",
+    "verifiedAt": "2025-10-05T08:30:00.000Z"
+  },
+  "event": {
+    "id": "60d5f9e4c8b1234567890abc",
+    "name": "Paper Presentation",
+    "category": "technical",
+    "type": "event"
+  },
+  "accessGranted": true,
+  "readyForCheckIn": true
+}
+```
+
+#### Access Denied Response (403):
+```json
+{
+  "success": false,
+  "step": "ACCESS_CONTROL",
+  "error": "ACCESS_DENIED",
+  "message": "❌ ACCESS DENIED\n\nYou are registered only for WORKSHOPS.\nThis is a TECHNICAL event.\n\nPlease register for general events to attend.",
+  "participant": {
+    "id": "SHWK001",
+    "name": "John Doe",
+    "registrationType": "workshop"
+  },
+  "event": {
+    "name": "Paper Presentation",
+    "category": "technical"
+  }
+}
+```
+
+#### Already Checked In Response (200):
+```json
+{
+  "success": true,
+  "alreadyCheckedIn": true,
+  "message": "⚠️ Already checked in for this event",
+  "participant": { ... },
+  "event": { ... },
+  "attendance": {
+    "checkInTime": "2025-10-05T09:00:00.000Z",
+    "checkInBy": "60d5f9e4c8b1234567890def"
+  }
+}
+```
+
+---
+
+## 2️⃣ Check-In Participant
+
+### `POST /check-in`
+
+Creates attendance record after QR validation.
+
+#### Request Body:
+```json
+{
+  "participantId": "SHEN001",
+  "eventId": "60d5f9e4c8b1234567890abc",
+  "eventType": "event",
+  "location": {
+    "latitude": 11.0168,
+    "longitude": 76.9558
+  },
+  "deviceInfo": {
+    "userAgent": "Mozilla/5.0...",
+    "ipAddress": "192.168.1.1"
+  }
+}
+```
+
+#### Success Response (201):
+```json
+{
+  "success": true,
+  "message": "✅ Check-in successful",
+  "attendance": {
+    "id": "60d5f9e4c8b1234567890ghi",
+    "participant": {
+      "id": "SHEN001",
+      "name": "Harish J",
+      "email": "harish@acgcet.edu",
+      "college": "ACGCET"
+    },
+    "event": {
+      "name": "Paper Presentation",
+      "category": "technical",
+      "venue": "Seminar Hall"
+    },
+    "checkInTime": "2025-10-05T09:15:00.000Z",
+    "checkInBy": {
+      "name": "Admin User",
+      "email": "admin@acgcet.edu"
+    }
+  }
+}
+```
+
+---
+
+## 3️⃣ Issue Registration Kit
+
+### `POST /issue-kit`
+
+Issues registration kit after QR validation.
+
+#### Request Body:
+```json
+{
+  "participantId": "SHEN001",
+  "collectionPoint": "main-desk",
+  "signature": "data:image/png;base64,iVBORw0KG...",
+  "deviceInfo": {
+    "userAgent": "Mozilla/5.0...",
+    "ipAddress": "192.168.1.1"
+  }
+}
+```
+
+#### Parameters:
+- `collectionPoint` (string, optional): `"main-desk"`, `"workshop-desk"`, `"event-venue"`
+- `signature` (string, optional): Base64 signature data
+
+#### Success Response (201):
+```json
+{
+  "success": true,
+  "message": "✅ Registration kit issued successfully",
+  "kit": {
+    "id": "60d5f9e4c8b1234567890jkl",
+    "idCardNumber": "SHACKLES-2025-0001",
+    "participant": {
+      "id": "SHEN001",
+      "name": "Harish J",
+      "college": "ACGCET",
+      "registrationType": "general"
+    },
+    "contents": [
+      { "item": "ID Card", "quantity": 1, "issued": true },
+      { "item": "Event Schedule", "quantity": 1, "issued": true },
+      { "item": "Event Bag", "quantity": 1, "issued": true },
+      { "item": "Pen", "quantity": 1, "issued": true },
+      { "item": "Notepad", "quantity": 1, "issued": true },
+      { "item": "Event Brochure", "quantity": 1, "issued": true },
+      { "item": "Badge", "quantity": 1, "issued": true }
+    ],
+    "issuedAt": "2025-10-05T08:45:00.000Z",
+    "issuedBy": {
+      "name": "Admin User",
+      "email": "admin@acgcet.edu"
+    }
+  }
+}
+```
+
+#### Kit Contents by Registration Type:
+
+**General Registration:**
+- ID Card
+- Event Schedule
+- Event Bag
+- Pen
+- Notepad
+- Event Brochure
+- Badge
+
+**Workshop Registration:**
+- Workshop ID Card
+- Workshop Material
+- Workshop Schedule
+- Certificate Template
+- Pen
+- Notepad
+- Badge
+
+**Both Registration:**
+- ID Card (General + Workshop)
+- Event Schedule
+- Workshop Material
+- Event Bag
+- Pen (×2)
+- Notepad
+- Event Brochure
+- Certificate Template
+- Badge
+- Workshop Toolkit
+
+#### Already Issued Response (200):
+```json
+{
+  "success": true,
+  "alreadyIssued": true,
+  "message": "⚠️ Kit already issued to this participant",
+  "kit": {
+    "issuedAt": "2025-10-05T08:45:00.000Z",
+    "issuedBy": { ... },
+    "idCardNumber": "SHACKLES-2025-0001",
+    "contents": [ ... ]
+  }
+}
+```
+
+---
+
+## 4️⃣ Combined: Scan + Check-In + Kit
+
+### `POST /scan-and-checkin`
+
+All-in-one: Validates QR, checks in, and optionally issues kit.
+
+#### Request Body:
+```json
+{
+  "qrData": "{\"participantId\":\"SHEN001\",...}",
+  "eventId": "60d5f9e4c8b1234567890abc",
+  "eventType": "event",
+  "issueKit": true,
+  "collectionPoint": "main-desk",
+  "signature": "data:image/png;base64,...",
+  "location": {
+    "latitude": 11.0168,
+    "longitude": 76.9558
+  },
+  "deviceInfo": {
+    "userAgent": "Mozilla/5.0...",
+    "ipAddress": "192.168.1.1"
+  }
+}
+```
+
+#### Parameters:
+- `issueKit` (boolean, optional): Set to `true` to issue kit during check-in
+
+#### Success Response (200):
+```json
+{
+  "success": true,
+  "message": "✅ QR scan completed successfully",
+  "participant": { ... },
+  "event": { ... },
+  "checkIn": {
+    "status": "success",
+    "checkInTime": "2025-10-05T09:15:00.000Z",
+    "message": "✅ Checked in successfully"
+  },
+  "kit": {
+    "status": "issued",
+    "idCardNumber": "SHACKLES-2025-0001",
+    "contents": [ ... ],
+    "message": "✅ Kit issued successfully"
+  }
+}
+```
+
+---
+
+## 5️⃣ Get Kit Status
+
+### `GET /kit-status/:participantId`
+
+Check if participant has received registration kit.
+
+#### URL Parameters:
+- `participantId`: Participant ID (e.g., `SHEN001`)
+
+#### Success Response (200) - Kit Issued:
+```json
+{
+  "success": true,
+  "kitIssued": true,
+  "kit": {
+    "idCardNumber": "SHACKLES-2025-0001",
+    "kitType": "general",
+    "contents": [ ... ],
+    "issuedAt": "2025-10-05T08:45:00.000Z",
+    "issuedBy": {
+      "name": "Admin User",
+      "email": "admin@acgcet.edu"
+    },
+    "collectionPoint": "main-desk"
+  },
+  "participant": {
+    "id": "SHEN001",
+    "name": "Harish J",
+    "email": "harish@acgcet.edu",
+    "registrationType": "general"
+  }
+}
+```
+
+#### Success Response (200) - Kit Not Issued:
+```json
+{
+  "success": true,
+  "kitIssued": false,
+  "participant": {
+    "id": "SHEN001",
+    "name": "Harish J",
+    "registrationType": "general"
+  },
+  "message": "Kit not yet issued"
+}
+```
+
+---
+
+## 6️⃣ Get Attendance History
+
+### `GET /history/:participantId`
+
+Get all attendance records for a participant.
+
+#### URL Parameters:
+- `participantId`: Participant ID (e.g., `SHEN001`)
+
+#### Success Response (200):
+```json
+{
+  "success": true,
+  "count": 3,
+  "participant": {
+    "id": "SHEN001",
+    "name": "Harish J",
+    "registrationType": "general"
+  },
+  "attendance": [
+    {
+      "_id": "60d5f9e4c8b1234567890ghi",
+      "user": { ... },
+      "event": {
+        "name": "Paper Presentation",
+        "category": "technical",
+        "venue": "Seminar Hall",
+        "date": "2025-10-06T10:00:00.000Z"
+      },
+      "checkInTime": "2025-10-06T09:15:00.000Z",
+      "checkOutTime": null,
+      "checkInBy": {
+        "name": "Admin User",
+        "email": "admin@acgcet.edu"
+      },
+      "checkInMethod": "qr"
+    },
+    {
+      "_id": "60d5f9e4c8b1234567890xyz",
+      "user": { ... },
+      "event": {
+        "name": "CAD Modelling",
+        "category": "technical",
+        "venue": "CAD Lab",
+        "date": "2025-10-07T10:00:00.000Z"
+      },
+      "checkInTime": "2025-10-07T09:30:00.000Z",
+      "checkOutTime": "2025-10-07T12:00:00.000Z",
+      "checkInBy": { ... },
+      "checkInMethod": "qr"
+    }
+  ]
+}
+```
+
+---
+
+## 🔄 Complete Workflow Examples
+
+### Scenario 1: QR Scan at Event Entrance
+
+```bash
+# Step 1: Scan QR code to validate
+POST /api/v1/qr-scan/scan-qr
+{
+  "qrData": "{...}",
+  "eventId": "event_id_here",
+  "eventType": "event"
+}
+# Response: Access granted / Access denied
+
+# Step 2: If access granted, check-in participant
+POST /api/v1/qr-scan/check-in
+{
+  "participantId": "SHEN001",
+  "eventId": "event_id_here",
+  "eventType": "event"
+}
+# Response: Check-in successful
+```
+
+### Scenario 2: Registration Desk (First Time)
+
+```bash
+# All-in-one: Validate + Check-in + Issue Kit
+POST /api/v1/qr-scan/scan-and-checkin
+{
+  "qrData": "{...}",
+  "eventId": "main_event_id",
+  "issueKit": true,
+  "collectionPoint": "main-desk"
+}
+# Response: QR validated, checked in, kit issued
+```
+
+### Scenario 3: Check Kit Status
+
+```bash
+# Check if participant already has kit
+GET /api/v1/qr-scan/kit-status/SHEN001
+# Response: Kit issued / not issued
+```
+
+### Scenario 4: View Attendance History
+
+```bash
+# Get all events attended by participant
+GET /api/v1/qr-scan/history/SHEN001
+# Response: List of all attended events
+```
+
+---
+
+## ❌ Error Responses
+
+### 400 - Bad Request
+```json
+{
+  "success": false,
+  "error": "MISSING_FIELDS",
+  "message": "QR data and event ID are required"
+}
+```
+
+### 403 - Access Denied
+```json
+{
+  "success": false,
+  "error": "ACCESS_DENIED",
+  "message": "❌ ACCESS DENIED\n\nYou are registered only for WORKSHOPS...",
+  "registrationType": "workshop",
+  "eventCategory": "technical"
+}
+```
+
+### 403 - Payment Not Verified
+```json
+{
+  "success": false,
+  "error": "PAYMENT_NOT_VERIFIED",
+  "message": "Payment not verified. Please contact registration desk.",
+  "participant": {
+    "id": "SHEN001",
+    "name": "Harish J",
+    "email": "harish@acgcet.edu"
+  }
+}
+```
+
+### 404 - Participant Not Found
+```json
+{
+  "success": false,
+  "error": "USER_NOT_FOUND",
+  "message": "Participant not found"
+}
+```
+
+### 404 - Event Not Found
+```json
+{
+  "success": false,
+  "error": "EVENT_NOT_FOUND",
+  "message": "Event not found"
+}
+```
+
+### 500 - Server Error
+```json
+{
+  "success": false,
+  "error": "SERVER_ERROR",
+  "message": "QR scan failed: [error details]"
+}
+```
+
+---
+
+## 🧪 Testing with Postman/cURL
+
+### Example cURL Command:
+
+```bash
+# Login as coordinator/admin first
+curl -X POST http://localhost:5000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@acgcet.edu",
+    "password": "Admin@123"
+  }'
+
+# Use the token from login response
+export TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+# Scan QR code
+curl -X POST http://localhost:5000/api/v1/qr-scan/scan-qr \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{
+    "qrData": "{\"participantId\":\"SHEN001\",\"name\":\"Harish J\",\"email\":\"harish@acgcet.edu\",\"registrationType\":\"general\"}",
+    "eventId": "60d5f9e4c8b1234567890abc",
+    "eventType": "event"
+  }'
+```
+
+---
+
+## 📊 Database Models
+
+### Attendance Model
+```javascript
+{
+  user: ObjectId (ref: User),
+  event: ObjectId (ref: Event),
+  workshop: ObjectId (ref: Workshop),
+  checkInTime: Date,
+  checkOutTime: Date,
+  checkInMethod: "qr" | "manual" | "registration",
+  checkInBy: ObjectId (ref: User),
+  location: { latitude, longitude },
+  deviceInfo: { userAgent, ipAddress }
+}
+```
+
+### KitDistribution Model
+```javascript
+{
+  participantId: String,
+  user: ObjectId (ref: User),
+  kitType: "general" | "workshop" | "both",
+  kitContents: [{ item, quantity, issued }],
+  issuedAt: Date,
+  issuedBy: ObjectId (ref: User),
+  issuanceMethod: "qr-scan" | "manual" | "registration-desk",
+  collectionPoint: "main-desk" | "workshop-desk" | "event-venue",
+  idCardNumber: String (unique),
+  participantSignature: String
+}
+```
+
+---
+
+## 🎉 Summary
+
+✅ **Complete QR scanning system with access control**
+✅ **Workshop registration → General event = ACCESS DENIED**
+✅ **General registration → Workshop = ACCESS DENIED**
+✅ **Both registration → Any event = FULL ACCESS**
+✅ **Attendance tracking with check-in/check-out**
+✅ **Registration kit distribution system**
+✅ **ID card generation (SHACKLES-2025-XXXX)**
+✅ **Attendance history tracking**
+✅ **Duplicate check-in prevention**
+✅ **Duplicate kit issuance prevention**
+
+**All APIs are ready to use! 🚀**

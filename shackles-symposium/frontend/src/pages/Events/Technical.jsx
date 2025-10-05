@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import api from '../../services/api';
 import '../../styles/Technical.css';
 
 const Technical = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [registeredEvents, setRegisteredEvents] = useState(new Set());
+  const [loading, setLoading] = useState(false);
+  const [registering, setRegistering] = useState(null);
+  const { isAuthenticated } = useAuth();
 
   const technicalEvents = [
     {
@@ -110,6 +116,57 @@ const Technical = () => {
     },
   ];
 
+  // Fetch user's registered events on mount
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchRegisteredEvents();
+    }
+  }, [isAuthenticated]);
+
+  const fetchRegisteredEvents = async () => {
+    try {
+      const { data } = await api.get('/event-registrations/my-registrations');
+      const eventIds = new Set(data.data.map(reg => reg.event._id));
+      setRegisteredEvents(eventIds);
+    } catch (error) {
+      console.error('Error fetching registrations:', error);
+    }
+  };
+
+  const handleRegisterEvent = async (event, e) => {
+    e.stopPropagation(); // Prevent modal from opening
+    
+    if (!isAuthenticated) {
+      alert('Please login to register for events');
+      return;
+    }
+
+    if (registeredEvents.has(event.id.toString())) {
+      alert('You are already registered for this event');
+      return;
+    }
+
+    setRegistering(event.id);
+    try {
+      const { data } = await api.post(`/event-registrations/${event.id}/register`, {
+        isTeamEvent: event.teamSize ? true : false,
+        teamMembers: [] // For now, empty. Can add team member modal later
+      });
+
+      alert(`Successfully registered for ${event.name}!`);
+      setRegisteredEvents(new Set([...registeredEvents, event.id.toString()]));
+    } catch (error) {
+      const message = error.response?.data?.message || 'Registration failed';
+      alert(message);
+    } finally {
+      setRegistering(null);
+    }
+  };
+
+  const isEventRegistered = (eventId) => {
+    return registeredEvents.has(eventId.toString());
+  };
+
   return (
     <div className="technical-events">
       <section className="technical-hero">
@@ -140,7 +197,24 @@ const Technical = () => {
                     <p className="coordinator-phone">{event.coordinator.phone}</p>
                   </div>
                 </div>
-                <button className="btn-view-details">View Details</button>
+                <div className="event-actions">
+                  <button className="btn-view-details">View Details</button>
+                  {isAuthenticated && (
+                    <button 
+                      className={`btn-register-event ${isEventRegistered(event.id) ? 'registered' : ''}`}
+                      onClick={(e) => handleRegisterEvent(event, e)}
+                      disabled={registering === event.id || isEventRegistered(event.id)}
+                    >
+                      {registering === event.id ? 'Registering...' : 
+                       isEventRegistered(event.id) ? '✓ Registered' : 'Register Now'}
+                    </button>
+                  )}
+                  {!isAuthenticated && (
+                    <Link to="/login" className="btn-register-event" onClick={(e) => e.stopPropagation()}>
+                      Login to Register
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -181,9 +255,21 @@ const Technical = () => {
               </div>
             </div>
 
-            <Link to="/register" className="btn-register-modal">
-              Register for this Event
-            </Link>
+            {isAuthenticated && (
+              <button 
+                className={`btn-register-modal ${isEventRegistered(selectedEvent.id) ? 'registered' : ''}`}
+                onClick={(e) => handleRegisterEvent(selectedEvent, e)}
+                disabled={registering === selectedEvent.id || isEventRegistered(selectedEvent.id)}
+              >
+                {registering === selectedEvent.id ? 'Registering...' : 
+                 isEventRegistered(selectedEvent.id) ? '✓ Already Registered' : 'Register for this Event'}
+              </button>
+            )}
+            {!isAuthenticated && (
+              <Link to="/login" className="btn-register-modal">
+                Login to Register
+              </Link>
+            )}
           </div>
         </div>
       )}

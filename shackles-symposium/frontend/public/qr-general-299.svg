@@ -1,0 +1,7 @@
+﻿<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="300" height="300" fill="#1a1a1a"/>
+  <rect x="50" y="50" width="200" height="200" fill="#0ad7a1" opacity="0.2"/>
+  <text x="150" y="130" font-family="Arial" font-size="24" fill="#fff" text-anchor="middle" font-weight="bold">QR Code for</text>
+  <text x="150" y="165" font-family="Arial" font-size="32" fill="#0ad7a1" text-anchor="middle" font-weight="bold">₹299</text>
+  <text x="150" y="195" font-family="Arial" font-size="16" fill="#aaa" text-anchor="middle">General Registration</text>
+</svg>

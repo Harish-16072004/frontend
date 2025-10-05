@@ -32,8 +32,8 @@ exports.uploadToS3 = async (file, folder = 'uploads', bucketName = null) => {
       Bucket: bucket,
       Key: fileName,
       Body: file.buffer || fs.createReadStream(file.path),
-      ContentType: file.mimetype,
-      ACL: 'public-read'
+      ContentType: file.mimetype
+      // Removed ACL - bucket uses bucket policy for public access
     };
 
     // Upload to S3
@@ -213,8 +213,8 @@ exports.uploadBase64ToS3 = async (base64String, folder = 'uploads', fileName = n
       Key: fileName,
       Body: buffer,
       ContentType: contentType,
-      ContentEncoding: 'base64',
-      ACL: 'public-read'
+      ContentEncoding: 'base64'
+      // Removed ACL - bucket uses bucket policy for public access
     };
 
     const result = await s3.upload(params).promise();
@@ -229,5 +229,42 @@ exports.uploadBase64ToS3 = async (base64String, folder = 'uploads', fileName = n
   } catch (error) {
     console.error('Base64 S3 upload error:', error);
     throw new Error('Failed to upload base64 image to S3');
+  }
+};
+
+/**
+ * Upload buffer directly to S3 (for QR codes, etc.)
+ * @param {Buffer} buffer - File buffer
+ * @param {String} fileName - File name with extension
+ * @param {String} contentType - MIME type
+ * @param {String} folder - Folder name in S3 bucket
+ * @returns {Promise<Object>} Upload result with file URL
+ */
+exports.uploadBufferToS3 = async (buffer, fileName, contentType = 'image/png', folder = 'participant-qr-code') => {
+  try {
+    const timestamp = Date.now();
+    const key = `${folder}/${timestamp}-${fileName}`;
+
+    const params = {
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: key,
+      Body: buffer,
+      ContentType: contentType
+      // Removed ACL - bucket uses bucket policy for public access
+    };
+
+    const result = await s3.upload(params).promise();
+
+    return {
+      success: true,
+      url: result.Location,
+      key: result.Key,
+      bucket: result.Bucket,
+      etag: result.ETag
+    };
+
+  } catch (error) {
+    console.error('❌ Buffer S3 upload error:', error);
+    throw new Error('Failed to upload buffer to S3: ' + error.message);
   }
 };

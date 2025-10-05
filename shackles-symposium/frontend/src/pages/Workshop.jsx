@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import api from '../services/api';
 import '../styles/Workshop.css';
 
 const Workshop = () => {
+  const [registeredWorkshops, setRegisteredWorkshops] = useState(new Set());
+  const [registering, setRegistering] = useState(null);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
   const workshops = [
     {
       id: 1,
@@ -45,6 +52,58 @@ const Workshop = () => {
       },
     },
   ];
+
+  // Fetch user's registered workshops on mount
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchRegisteredWorkshops();
+    }
+  }, [isAuthenticated]);
+
+  const fetchRegisteredWorkshops = async () => {
+    try {
+      const { data } = await api.get('/event-registrations/my-registrations');
+      const workshopIds = new Set(data.data.map(reg => reg.event._id));
+      setRegisteredWorkshops(workshopIds);
+    } catch (error) {
+      console.error('Error fetching registrations:', error);
+    }
+  };
+
+  const handleRegisterWorkshop = async (workshop, e) => {
+    e.stopPropagation();
+    
+    if (!isAuthenticated) {
+      alert('Please login to register for workshops');
+      navigate('/login');
+      return;
+    }
+
+    if (registeredWorkshops.has(workshop.id.toString())) {
+      alert('You are already registered for this workshop');
+      return;
+    }
+
+    setRegistering(workshop.id);
+    try {
+      const { data } = await api.post(`/event-registrations/${workshop.id}/register`, {
+        isTeamEvent: false,
+        teamMembers: []
+      });
+
+      alert(`Successfully registered for ${workshop.name}!`);
+      setRegisteredWorkshops(new Set([...registeredWorkshops, workshop.id.toString()]));
+    } catch (error) {
+      const message = error.response?.data?.message || 'Registration failed';
+      alert(message);
+    } finally {
+      setRegistering(null);
+    }
+  };
+
+  const isWorkshopRegistered = (workshopId) => {
+    return registeredWorkshops.has(workshopId.toString());
+  };
 
   return (
     <div className="workshop">
@@ -98,6 +157,26 @@ const Workshop = () => {
                   <p className="coordinator-name">{workshop.coordinator.name}</p>
                   <p className="coordinator-phone">{workshop.coordinator.phone}</p>
                 </div>
+              </div>
+
+              <div className="workshop-actions">
+                {isAuthenticated ? (
+                  <button 
+                    className={`btn-register-workshop ${isWorkshopRegistered(workshop.id) ? 'registered' : ''}`}
+                    onClick={(e) => handleRegisterWorkshop(workshop, e)}
+                    disabled={registering === workshop.id || isWorkshopRegistered(workshop.id)}
+                  >
+                    {registering === workshop.id ? 'Registering...' : 
+                     isWorkshopRegistered(workshop.id) ? '✓ Registered' : 'Register Now'}
+                  </button>
+                ) : (
+                  <button 
+                    className="btn-register-workshop"
+                    onClick={() => navigate('/login')}
+                  >
+                    Login to Register
+                  </button>
+                )}
               </div>
             </div>
           ))}

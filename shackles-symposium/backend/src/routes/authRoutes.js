@@ -11,9 +11,10 @@ const {
   updateProfile
 } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
+const { uploadPaymentProof } = require('../middleware/upload');
 
 // Public routes
-router.post('/register', register);
+router.post('/register', uploadPaymentProof, register);
 router.post('/login', login);
 router.post('/forgot-password', forgotPassword);
 router.put('/reset-password/:resetToken', resetPassword);

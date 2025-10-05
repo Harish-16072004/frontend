@@ -791,3 +791,49 @@
   }
 }
 
+/* Workshop Registration Button */
+.workshop-actions {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-register-workshop {
+  width: 100%;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
+
+.btn-register-workshop:hover {
+  background: linear-gradient(135deg, #2980b9, #3498db);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+}
+
+.btn-register-workshop:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-register-workshop.registered {
+  background: linear-gradient(135deg, #0ad7a1, #08b587);
+  box-shadow: 0 4px 15px rgba(10, 215, 161, 0.4);
+}
+
+.btn-register-workshop.registered:hover {
+  background: linear-gradient(135deg, #08b587, #0ad7a1);
+  box-shadow: 0 6px 20px rgba(10, 215, 161, 0.6);
+}
+

@@ -332,32 +332,34 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
+/* Register Now - transparent border, blue glow on hover */
 .btn-hero-primary {
   background: transparent;
   color: rgba(255, 255, 255, 0.9);
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  border: 2px solid transparent;
 }
 
 .btn-hero-primary:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: transparent;
   color: white;
-  border-color: rgba(255, 255, 255, 0.8);
+  border-color: transparent;
   transform: translateY(-5px);
-  box-shadow: 0 10px 40px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 40px rgba(59, 130, 246, 0.2);
 }
 
+/* View Events - transparent border, red glow on hover */
 .btn-hero-secondary {
   background: transparent;
   color: rgba(255, 255, 255, 0.9);
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  border: 2px solid transparent;
 }
 
 .btn-hero-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: transparent;
   color: white;
-  border-color: rgba(255, 255, 255, 0.8);
+  border-color: transparent;
   transform: translateY(-5px);
-  box-shadow: 0 10px 40px rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 40px rgba(239, 68, 68, 0.2);
 }
 
 .location-city {

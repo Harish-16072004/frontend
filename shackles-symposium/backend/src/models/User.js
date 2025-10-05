@@ -46,9 +46,65 @@ const UserSchema = new mongoose.Schema({
     required: [true, 'Please provide year'],
     enum: ['1', '2', '3', '4']
   },
+  collegeLocation: {
+    type: String,
+    trim: true
+  },
   rollNumber: {
     type: String,
     trim: true
+  },
+  registrationType: {
+    type: String,
+    enum: ['general', 'workshop', 'both'],
+    default: null
+  },
+  paymentAmount: {
+    type: Number,
+    default: 0
+  },
+  transactionId: {
+    type: String,
+    trim: true
+  },
+  paymentScreenshot: {
+    type: String,
+    default: null
+  },
+  paymentStatus: {
+    type: String,
+    enum: ['pending', 'verified', 'rejected'],
+    default: 'pending'
+  },
+  verificationNotes: {
+    type: String,
+    default: null
+  },
+  verifiedAt: {
+    type: Date,
+    default: null
+  },
+  verifiedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  rejectionReason: {
+    type: String,
+    default: null
+  },
+  rejectedAt: {
+    type: Date,
+    default: null
+  },
+  rejectedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  termsAccepted: {
+    type: Boolean,
+    default: false
   },
   role: {
     type: String,
@@ -71,9 +127,19 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Payment'
   }],
-  qrCode: {
+  participantId: {
     type: String,
-    default: null
+    unique: true,
+    sparse: true // Allows multiple documents without this field, enforces uniqueness when present
+    // No default value - field won't exist until payment verification
+  },
+  qrCode: {
+    type: String
+    // No default value - field added only on verification
+  },
+  qrCodeKey: {
+    type: String
+    // No default value - field added only on verification
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,

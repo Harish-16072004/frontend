@@ -47,8 +47,14 @@ const Login = () => {
     setLoading(true);
 
     try {
-      await login(formData.email, formData.password, formData.rememberMe);
-      navigate('/profile');
+      const response = await login(formData.email, formData.password, formData.rememberMe);
+      
+      // Redirect based on user role
+      if (response.data.role === 'admin' || response.data.role === 'coordinator') {
+        navigate('/admin');
+      } else {
+        navigate('/profile');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
