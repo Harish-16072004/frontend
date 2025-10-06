@@ -6,13 +6,17 @@ const {
   createWorkshop,
   updateWorkshop,
   deleteWorkshop,
-  getWorkshopRegistrations
+  getWorkshopRegistrations,
+  registerWorkshop
 } = require('../controllers/workshopController');
 const { protect, authorize } = require('../middleware/auth');
 
 // Public routes
 router.get('/', getWorkshops);
 router.get('/:id', getWorkshop);
+
+// Protected user routes
+router.post('/:id/register', protect, registerWorkshop);
 
 // Protected admin routes
 router.post('/', protect, authorize('admin'), createWorkshop);

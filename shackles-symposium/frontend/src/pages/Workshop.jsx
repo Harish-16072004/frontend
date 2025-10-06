@@ -7,12 +7,15 @@ import '../styles/Workshop.css';
 const Workshop = () => {
   const [registeredWorkshops, setRegisteredWorkshops] = useState(new Set());
   const [registering, setRegistering] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [workshops, setWorkshops] = useState([]);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const workshops = [
+  // Fallback static workshops (used if API fails)
+  const staticWorkshops = [
     {
-      id: 1,
+      id: 'additive-manufacturing',
       name: 'Additive Manufacturing Workshop',
       time: '10:00 AM - 1:00 PM',
       date: 'October 23, 2025',
@@ -32,7 +35,7 @@ const Workshop = () => {
       },
     },
     {
-      id: 2,
+      id: 'iot-workshop',
       name: 'IoT (Internet of Things) Workshop',
       time: '2:00 PM - 5:00 PM',
       date: 'October 23, 2025',
@@ -53,6 +56,45 @@ const Workshop = () => {
     },
   ];
 
+  // Fetch workshops from API  
+  useEffect(() => {
+    const fetchWorkshops = async () => {
+      try {
+        // Fetch workshops from the workshops API endpoint
+        const { data } = await api.get('/workshops');
+        console.log('📦 Workshop API Response:', data);
+        
+        if (data && data.data && Array.isArray(data.data) && data.data.length > 0) {
+          console.log(`✅ Found ${data.data.length} workshops from API`);
+          // Transform workshop data to match component expectations
+          const transformedWorkshops = data.data.map(w => ({
+            ...w,
+            name: w.title, // Workshop model uses 'title'
+            date: w.schedule?.[0]?.date ? new Date(w.schedule[0].date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'TBA',
+            time: w.schedule?.[0] ? `${w.schedule[0].startTime} - ${w.schedule[0].endTime}` : 'TBA',
+            topics: w.learningOutcomes || [], // Use learningOutcomes as topics
+            trainer: w.instructor?.name ? `${w.instructor.name}${w.instructor.designation ? ', ' + w.instructor.designation : ''}` : 'Expert Trainer',
+            coordinator: {
+              name: 'Workshop Team',
+              phone: '+91 9514585887'
+            }
+          }));
+          setWorkshops(transformedWorkshops);
+        } else {
+          console.log('⚠️ No workshops found in API, using static fallback');
+          setWorkshops(staticWorkshops);
+        }
+      } catch (error) {
+        console.error('❌ Error fetching workshops:', error);
+        console.error('Error details:', error.response?.data || error.message);
+        setWorkshops(staticWorkshops);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchWorkshops();
+  }, []);
+
   // Fetch user's registered workshops on mount
   useEffect(() => {
     if (isAuthenticated) {
@@ -62,8 +104,22 @@ const Workshop = () => {
 
   const fetchRegisteredWorkshops = async () => {
     try {
+      // Fetch both event registrations and workshop registrations
       const { data } = await api.get('/event-registrations/my-registrations');
-      const workshopIds = new Set(data.data.map(reg => reg.event._id));
+      
+      // Filter for workshop category events and actual workshop registrations
+      const workshopIds = new Set();
+      
+      data.data.forEach(reg => {
+        if (reg.event && reg.event._id) {
+          workshopIds.add(reg.event._id);
+        }
+        if (reg.workshop && reg.workshop._id) {
+          workshopIds.add(reg.workshop._id);
+        }
+      });
+      
+      console.log('Registered workshop IDs:', Array.from(workshopIds));
       setRegisteredWorkshops(workshopIds);
     } catch (error) {
       console.error('Error fetching registrations:', error);
@@ -79,23 +135,30 @@ const Workshop = () => {
       return;
     }
 
-    if (registeredWorkshops.has(workshop.id.toString())) {
+    // Check if this is a real workshop from database (has _id)
+    if (!workshop._id) {
+      alert('Workshop registration is currently unavailable. Workshops are being set up in the database. Please check back later.');
+      return;
+    }
+
+    const workshopId = workshop._id;
+
+    if (registeredWorkshops.has(workshopId)) {
       alert('You are already registered for this workshop');
       return;
     }
 
-    setRegistering(workshop.id);
+    setRegistering(workshopId);
     try {
-      const { data } = await api.post(`/event-registrations/${workshop.id}/register`, {
-        isTeamEvent: false,
-        teamMembers: []
-      });
+      // Use the workshop-specific registration endpoint
+      const { data } = await api.post(`/workshops/${workshopId}/register`);
 
-      alert(`Successfully registered for ${workshop.name}!`);
-      setRegisteredWorkshops(new Set([...registeredWorkshops, workshop.id.toString()]));
+      alert(`Successfully registered for ${workshop.name || workshop.title}!`);
+      setRegisteredWorkshops(new Set([...registeredWorkshops, workshopId]));
     } catch (error) {
       const message = error.response?.data?.message || 'Registration failed';
       alert(message);
+      console.error('Registration error:', error.response?.data || error.message);
     } finally {
       setRegistering(null);
     }
@@ -114,12 +177,17 @@ const Workshop = () => {
         <p className="workshop-date">October 23, 2025 | ACGCET Karaikudi</p>
       </section>
 
+      {loading ? (
+        <div className="loading-container">
+          <p>Loading workshops...</p>
+        </div>
+      ) : (
       <section className="workshop-grid">
         <div className="workshop-container">
           {workshops.map((workshop) => (
-            <div key={workshop.id} className="workshop-card">
+            <div key={workshop._id || workshop.id} className="workshop-card">
               <div className="workshop-badge">
-                <span className="badge-text">Workshop {workshop.id}</span>
+                <span className="badge-text">Workshop</span>
               </div>
               
               <h2 className="workshop-name">{workshop.name}</h2>
@@ -137,37 +205,56 @@ const Workshop = () => {
 
               <p className="workshop-description">{workshop.description}</p>
 
-              <div className="workshop-topics">
-                <h3>What You'll Learn:</h3>
-                <ul>
-                  {workshop.topics.map((topic, index) => (
-                    <li key={index}>{topic}</li>
-                  ))}
-                </ul>
-              </div>
+              {workshop.topics && workshop.topics.length > 0 && (
+                <div className="workshop-topics">
+                  <h3>What You'll Learn:</h3>
+                  <ul>
+                    {workshop.topics.map((topic, index) => (
+                      <li key={index}>{topic}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
-              <div className="workshop-trainer">
-                <h4>Trainer:</h4>
-                <p>{workshop.trainer}</p>
-              </div>
+              {workshop.rules && workshop.rules.length > 0 && !workshop.topics && (
+                <div className="workshop-topics">
+                  <h3>Details:</h3>
+                  <ul>
+                    {workshop.rules.map((rule, index) => (
+                      <li key={index}>{rule}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {workshop.trainer && (
+                <div className="workshop-trainer">
+                  <h4>Trainer:</h4>
+                  <p>{workshop.trainer}</p>
+                </div>
+              )}
 
               <div className="workshop-coordinator">
                 <span className="coordinator-icon">📞</span>
                 <div>
-                  <p className="coordinator-name">{workshop.coordinator.name}</p>
-                  <p className="coordinator-phone">{workshop.coordinator.phone}</p>
+                  <p className="coordinator-name">
+                    {workshop.coordinators?.[0]?.name || workshop.coordinator?.name || 'Workshop Team'}
+                  </p>
+                  <p className="coordinator-phone">
+                    {workshop.coordinators?.[0]?.phone || workshop.coordinator?.phone || 'TBA'}
+                  </p>
                 </div>
               </div>
 
               <div className="workshop-actions">
                 {isAuthenticated ? (
                   <button 
-                    className={`btn-register-workshop ${isWorkshopRegistered(workshop.id) ? 'registered' : ''}`}
+                    className={`btn-register-workshop ${isWorkshopRegistered(workshop._id || workshop.id) ? 'registered' : ''}`}
                     onClick={(e) => handleRegisterWorkshop(workshop, e)}
-                    disabled={registering === workshop.id || isWorkshopRegistered(workshop.id)}
+                    disabled={registering === (workshop._id || workshop.id) || isWorkshopRegistered(workshop._id || workshop.id)}
                   >
-                    {registering === workshop.id ? 'Registering...' : 
-                     isWorkshopRegistered(workshop.id) ? '✓ Registered' : 'Register Now'}
+                    {registering === (workshop._id || workshop.id) ? 'Registering...' : 
+                     isWorkshopRegistered(workshop._id || workshop.id) ? '✓ Registered' : 'Register Now'}
                   </button>
                 ) : (
                   <button 
@@ -182,6 +269,7 @@ const Workshop = () => {
           ))}
         </div>
       </section>
+      )}
 
       <section className="workshop-pricing">
         <div className="pricing-container">

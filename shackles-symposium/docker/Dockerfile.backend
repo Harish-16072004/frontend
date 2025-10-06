@@ -1,0 +1,60 @@
+# Multi-stage build for Backend
+
+# Stage 1: Base
+FROM node:18-alpine AS base
+WORKDIR /app
+RUN apk add --no-cache curl
+
+# Stage 2: Dependencies
+FROM base AS dependencies
+COPY package*.json ./
+RUN npm ci --only=production && \
+    npm cache clean --force
+
+# Stage 3: Development dependencies (for dev builds)
+FROM dependencies AS dev-dependencies
+RUN npm ci
+
+# Stage 4: Development
+FROM base AS development
+WORKDIR /app
+COPY --from=dev-dependencies /app/node_modules ./node_modules
+COPY . .
+EXPOSE 5000
+ENV NODE_ENV=development
+CMD ["npm", "run", "dev"]
+
+# Stage 5: Builder (for production build if needed)
+FROM base AS builder
+WORKDIR /app
+COPY --from=dev-dependencies /app/node_modules ./node_modules
+COPY . .
+# Add build step if you have a build process
+# RUN npm run build
+
+# Stage 6: Production
+FROM base AS production
+WORKDIR /app
+
+# Copy only production dependencies
+COPY --from=dependencies /app/node_modules ./node_modules
+
+# Copy application code
+COPY . .
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 && \
+    chown -R nodejs:nodejs /app
+
+USER nodejs
+
+EXPOSE 5000
+
+ENV NODE_ENV=production
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost:5000/api/health || exit 1
+
+CMD ["node", "src/server.js"]

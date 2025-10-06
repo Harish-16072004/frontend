@@ -1,8 +1,12 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import '../styles/Home.css';
+import acgcetLogo from '../assets/images/ACGCET.webp';
+import departmentLogo from '../assets/images/DEPARTMENT.webp';
+import shacklesLogo from '../assets/images/ASSOLOGO.webp';
 
 function Home() {
+  const location = useLocation();
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -11,6 +15,20 @@ function Home() {
   });
   const [showSparkles, setShowSparkles] = useState(false);
   const [countdownEnded, setCountdownEnded] = useState(false);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  // Effect to scroll to top when location changes
+  useEffect(() => {
+    scrollToTop();
+  }, [location.pathname]);
 
   useEffect(() => {
     const eventDate = new Date('2025-10-23T00:00:00');
@@ -112,10 +130,10 @@ function Home() {
           <p className="hero-tagline">Let's Begin the Game</p>
 
           <div className="hero-actions">
-            <Link to="/register" className="btn-hero-primary">
+            <Link to="/register" className="btn-register-base btn-register-primary btn-register-large" aria-label="Register Now">
               Register Now
             </Link>
-            <Link to="/events" className="btn-hero-secondary">
+            <Link to="/events" className="btn-register-base btn-register-secondary btn-register-large">
               View Events
             </Link>
           </div>
@@ -199,7 +217,7 @@ function Home() {
           <Link to="/events/non-technical" className="category-card non-technical">
             <span className="category-symbol">○</span>
             <h3>Non-Technical Events</h3>
-            <p>3 Strategy Games</p>
+            <p>4 Strategy Games</p>
             <span className="category-badge">Circle</span>
           </Link>
 
@@ -236,7 +254,7 @@ function Home() {
             </div>
         
             <div className="stat-box">
-              <span className="stat-number">11</span>
+              <span className="stat-number">12</span>
               <span className="stat-label">Events</span>
             </div>
             <div className="stat-box">
@@ -245,10 +263,10 @@ function Home() {
             </div>
           </div>
           <div className="cta-actions">
-            <Link to="/register" className="btn-cta-primary">
-              Enter The Game
+            <Link to="/maintenance" className="btn-register-base btn-register-maintenance btn-register-large">
+              Registration Coming Soon 🔧
             </Link>
-            <Link to="/contact" className="btn-cta-secondary">
+            <Link to="/contact" className="btn-register-base btn-register-secondary btn-register-large">
               Learn More
             </Link>
           </div>
@@ -267,35 +285,35 @@ function Home() {
           {/* Institution */}
           <div className="organizer-card">
             <div className="organizer-icon">
-              <div className="about-icon">■</div>
+              <img src={acgcetLogo} alt="ACGCET" className="organizer-img" />
             </div>
             <h3>Alagappa Chettiar Government College of Engineering and Technology</h3>
             <p>
-              Established with a vision to create world-class engineers, ACGCET stands as a 
-              beacon of technical excellence in Tamil Nadu. For decades, we have shaped minds, 
-              nurtured innovation, and prepared students to face the challenges of the modern world. 
-              Our institution is the foundation upon which champions are built.
+              Our institution ACGCET stands tall as a beacon of knowledge with a proud legacy of over 70 years. As an autonomous 
+              government institution, we combine the richness of tradition with the dynamism of innovation to deliver world-class 
+              education at an affordable cost. Our serene campus, experienced faculty, and industry-focused curriculum create the 
+              perfect environment for intellectual growth and holistic development. Beyond academics, our institute offers student
+              associations, clubs, sports, and cultural platforms that nurture leadership, creativity, and teamwork. At ACGCET, we
+              are committed to empowering students to transform into skilled professionals and responsible individuals, ready to
+              thrive in an ever-evolving global landscape.
             </p>
           </div>
 
           {/* Department */}
           <div className="organizer-card">
             <div className="organizer-icon">
-              <div className="about-icon">○</div>
+              <img src={departmentLogo} alt="Department of Mechanical Engineering" className="organizer-img" />
             </div>
             <h3>Department of Mechanical Engineering</h3>
             <p>
-              At the heart of innovation lies the Department of Mechanical Engineering. 
-              We don't just teach theory—we forge problem-solvers, designers, and leaders. 
-              Through rigorous training, cutting-edge projects, and real-world applications, 
-              our department transforms students into industry-ready professionals who drive technological advancement.
+              Established in 1952, our NBA-accredited Department of Mechanical Engineering is a hub of innovation and excellence. We offer a comprehensive range of programs including B.E. (Full-time & Part-time), M.E. in Manufacturing and CAD, and a robust Ph.D. program. Recognized as a research center by Anna University since 2002, we have proudly produced over 50 Ph.D.s in cutting-edge fields like Additive Manufacturing, Robotics, and Composite Materials. Our students gain hands-on experience in state-of-the-art facilities, including a Centre of Excellence in Additive Manufacturing, and enhance their employability through industrial internships and active participation in prestigious national competitions like SAE BAJA and GO-KART.
             </p>
           </div>
 
           {/* SHACKLES */}
           <div className="organizer-card">
             <div className="organizer-icon">
-              <div className="about-icon">△</div>
+              <img src={shacklesLogo} alt="SHACKLES Association Logo" className="organizer-img" />
             </div>
             <h3>SHACKLES 25-26: The Ultimate Test</h3>
             <p>

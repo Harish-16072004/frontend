@@ -129,8 +129,8 @@ const UserSchema = new mongoose.Schema({
   }],
   participantId: {
     type: String,
-    unique: true,
-    sparse: true // Allows multiple documents without this field, enforces uniqueness when present
+    sparse: true, // Allows multiple documents without this field, enforces uniqueness when present
+    index: { unique: true, sparse: true }
     // No default value - field won't exist until payment verification
   },
   qrCode: {

@@ -6,10 +6,23 @@ const Registration = require('../models/Registration');
 // @access  Public
 exports.getEvents = async (req, res) => {
   try {
-    const events = await Event.find({ isActive: true })
+    // Build query based on query parameters
+    let query = { isActive: true };
+    
+    // Check if category is provided as query parameter
+    if (req.query.category) {
+      query.category = req.query.category.toLowerCase();
+      console.log(`🔍 Fetching events with category: ${req.query.category}`);
+    } else {
+      console.log('🔍 Fetching all active events');
+    }
+    
+    const events = await Event.find(query)
       .populate('coordinators', 'name email phone')
       .populate('registrations')
       .sort('date');
+
+    console.log(`✅ Found ${events.length} events matching query:`, query);
 
     res.status(200).json({
       success: true,
@@ -18,6 +31,7 @@ exports.getEvents = async (req, res) => {
       data: events
     });
   } catch (error) {
+    console.error('❌ Error fetching events:', error.message);
     res.status(500).json({
       success: false,
       message: error.message

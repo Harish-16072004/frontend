@@ -1,9 +1,15 @@
+/* ===================================
+   PROFILE PAGE - SQUID GAME THEME
+   =================================== */
+
 .profile-page {
   min-height: calc(100vh - 80px);
   padding: 2rem 1rem;
-  background: linear-gradient(135deg, 
-    rgba(10, 215, 161, 0.03) 0%, 
-    rgba(227, 27, 108, 0.03) 100%);
+  background: #000000;
+  background-image: 
+    linear-gradient(rgba(0, 215, 161, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(227, 27, 108, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
 }
 
 .profile-container {
@@ -14,20 +20,27 @@
 .profile-header {
   text-align: center;
   margin-bottom: 3rem;
+  padding: 2rem 0;
+  border-bottom: 3px solid #00D7A1;
 }
 
 .profile-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: clamp(2rem, 5vw, 3rem);
-  color: var(--guard-pink);
+  font-family: 'GameOfSquids', 'Orbitron', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  color: #E31B6C;
   margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px rgba(227, 27, 108, 0.5);
 }
 
 .profile-subtitle {
   font-family: 'Rajdhani', sans-serif;
-  font-size: 1.2rem;
-  color: var(--text-secondary);
-  font-weight: 600;
+  font-size: 1.3rem;
+  color: #00D7A1;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 .profile-content {
@@ -36,139 +49,208 @@
   gap: 2rem;
 }
 
+/* === QR CODE SECTION === */
 .qr-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 2rem;
 }
 
 .qr-card,
 .status-card {
-  background: white;
-  border: 2px solid var(--player-green);
+  background: #000000;
+  border: 3px solid #00D7A1;
   border-radius: 16px;
   padding: 2rem;
   text-align: center;
+  box-shadow: 
+    0 0 30px rgba(0, 215, 161, 0.2),
+    inset 0 0 30px rgba(0, 215, 161, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.qr-card::before,
+.status-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    transparent,
+    #00D7A1,
+    transparent
+  );
+  animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
 }
 
 .card-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 1.5rem;
-  color: var(--player-green);
+  font-family: 'GameOfSquids', 'Orbitron', sans-serif;
+  font-size: 1.8rem;
+  color: #E31B6C;
   margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
 }
 
 .qr-wrapper {
   display: flex;
   justify-content: center;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  background: white;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  background: #FFFFFF;
+  border: 2px solid #00D7A1;
   border-radius: 12px;
+  box-shadow: 
+    0 0 20px rgba(0, 215, 161, 0.3),
+    inset 0 0 20px rgba(0, 215, 161, 0.1);
 }
 
 .registration-id {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 1.1rem;
+  font-family: 'Orbitron', monospace, sans-serif;
+  font-size: 1.3rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #00D7A1;
   margin-bottom: 1rem;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0, 215, 161, 0.5);
 }
 
 .qr-instruction {
   font-family: 'Rajdhani', sans-serif;
-  color: var(--text-secondary);
-  font-size: 0.95rem;
+  color: #FFFFFF;
+  font-size: 1rem;
   line-height: 1.6;
   margin-bottom: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 1px;
 }
 
 .download-qr-btn {
-  padding: 0.875rem 1.5rem;
-  background: linear-gradient(135deg, var(--player-green), #08b88a);
-  color: white;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #00D7A1, #00A67D);
+  color: #000000;
   border: none;
   border-radius: 8px;
   font-family: 'Rajdhani', sans-serif;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 15px rgba(0, 215, 161, 0.3);
 }
 
-.download-qr-btn:hover {
+.download-qr-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(10, 215, 161, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 215, 161, 0.5);
+  background: linear-gradient(135deg, #00FFB8, #00D7A1);
 }
 
-.status-card {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  border-color: var(--guard-pink);
+.download-qr-btn:disabled {
+  background: rgba(128, 128, 128, 0.3);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
+/* === STATUS SECTION === */
 .status-item {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.status-item:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: rgba(0, 215, 161, 0.05);
+  border-left: 3px solid #E31B6C;
+  border-radius: 4px;
 }
 
 .status-label {
   font-family: 'Rajdhani', sans-serif;
   font-size: 0.9rem;
-  color: var(--text-secondary);
-  font-weight: 600;
+  color: #FFFFFF;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
 .status-value {
   font-family: 'Orbitron', sans-serif;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  color: #00D7A1;
+  font-weight: 600;
+}
+
+.status-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-family: 'Rajdhani', sans-serif;
   font-weight: 700;
-  color: var(--text-primary);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.status-value.verified {
-  color: var(--player-green);
+.status-badge.verified {
+  background: rgba(0, 215, 161, 0.2);
+  color: #00FFB8;
+  border: 2px solid #00D7A1;
 }
 
-.status-value.pending {
-  color: var(--vip-gold);
+.status-badge.pending {
+  background: rgba(255, 193, 7, 0.2);
+  color: #FFC107;
+  border: 2px solid #FFC107;
+}
+
+.status-badge.rejected {
+  background: rgba(227, 27, 108, 0.2);
+  color: #E31B6C;
+  border: 2px solid #E31B6C;
 }
 
 .status-value.amount {
-  color: var(--guard-pink);
   font-size: 1.5rem;
+  color: #00FFB8;
+  font-weight: 700;
 }
 
+.registration-type {
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* === DETAILS SECTION === */
 .details-section,
 .events-section,
-.workshops-section,
-.accommodation-section,
 .info-section {
-  background: white;
-  border: 2px solid #e0e0e0;
+  background: #000000;
+  border: 2px solid #E31B6C;
   border-radius: 16px;
   padding: 2rem;
+  box-shadow: 
+    0 0 30px rgba(227, 27, 108, 0.2),
+    inset 0 0 30px rgba(227, 27, 108, 0.05);
 }
 
 .section-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 1.3rem;
-  color: var(--guard-pink);
+  font-family: 'GameOfSquids', 'Orbitron', sans-serif;
+  font-size: 1.8rem;
+  color: #E31B6C;
   margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border-bottom: 2px solid rgba(227, 27, 108, 0.3);
+  padding-bottom: 0.5rem;
 }
 
 .details-grid {
@@ -181,91 +263,84 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(0, 215, 161, 0.05);
+  border-left: 3px solid #00D7A1;
+  border-radius: 4px;
 }
 
 .detail-label {
   font-family: 'Rajdhani', sans-serif;
   font-size: 0.85rem;
-  color: var(--text-secondary);
-  font-weight: 600;
+  color: #FFFFFF;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  opacity: 0.7;
 }
 
 .detail-value {
   font-family: 'Rajdhani', sans-serif;
   font-size: 1.1rem;
+  color: #00D7A1;
   font-weight: 600;
-  color: var(--text-primary);
 }
 
-.events-list,
-.workshops-list {
+/* === EVENTS SECTION === */
+.events-list {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
 }
 
-.event-badge,
-.workshop-badge {
-  padding: 0.75rem 1.25rem;
-  background: linear-gradient(135deg, rgba(227, 27, 108, 0.1), rgba(10, 215, 161, 0.1));
-  border: 2px solid var(--player-green);
-  border-radius: 50px;
+.event-badge {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, rgba(0, 215, 161, 0.2), rgba(0, 215, 161, 0.1));
+  border: 2px solid #00D7A1;
+  border-radius: 25px;
+  color: #00FFB8;
   font-family: 'Rajdhani', sans-serif;
   font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--text-primary);
-  text-transform: capitalize;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 0 15px rgba(0, 215, 161, 0.2);
+  transition: all 0.3s ease;
 }
 
-.workshop-badge {
-  border-color: var(--vip-gold);
-  background: linear-gradient(135deg, rgba(255, 191, 0, 0.1), rgba(10, 215, 161, 0.1));
+.event-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 215, 161, 0.4);
+  background: linear-gradient(135deg, rgba(0, 215, 161, 0.3), rgba(0, 215, 161, 0.2));
 }
 
-.accommodation-info {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 1.05rem;
-  line-height: 1.8;
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.accommodation-info p {
-  margin-bottom: 0.5rem;
-}
-
+/* === INFO SECTION === */
 .info-list {
   list-style: none;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
 }
 
 .info-list li {
   font-family: 'Rajdhani', sans-serif;
   font-size: 1.05rem;
-  color: var(--text-primary);
+  color: #FFFFFF;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(227, 27, 108, 0.2);
   font-weight: 600;
-  padding-left: 1.5rem;
-  position: relative;
+  letter-spacing: 0.5px;
 }
 
-.info-list li::before {
-  content: '▸';
-  position: absolute;
-  left: 0;
-  color: var(--player-green);
-  font-size: 1.2rem;
+.info-list li:last-child {
+  border-bottom: none;
 }
 
+/* === ACTIONS SECTION === */
 .profile-actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
 }
 
 .action-btn {
@@ -277,37 +352,65 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   text-decoration: none;
-  text-align: center;
+  display: inline-block;
+}
+
+.register-more-btn {
+  background: linear-gradient(135deg, #00D7A1, #00A67D);
+  color: #000000;
+  border: 2px solid #00D7A1;
+  box-shadow: 0 4px 15px rgba(0, 215, 161, 0.3);
+}
+
+.register-more-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 215, 161, 0.5);
+  background: linear-gradient(135deg, #00FFB8, #00D7A1);
 }
 
 .support-btn {
-  background: linear-gradient(135deg, var(--player-green), #08b88a);
-  color: white;
-  border: 2px solid var(--player-green);
+  background: rgba(227, 27, 108, 0.2);
+  color: #E31B6C;
+  border: 2px solid #E31B6C;
+  box-shadow: 0 4px 15px rgba(227, 27, 108, 0.3);
 }
 
 .support-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(10, 215, 161, 0.3);
+  box-shadow: 0 6px 20px rgba(227, 27, 108, 0.5);
+  background: rgba(227, 27, 108, 0.3);
+  color: #FF3385;
 }
 
 .logout-btn {
-  background: transparent;
-  color: var(--guard-pink);
-  border: 2px solid var(--guard-pink);
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
 }
 
 .logout-btn:hover {
-  background: var(--guard-pink);
-  color: white;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(227, 27, 108, 0.3);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
 }
 
+/* === RESPONSIVE DESIGN === */
 @media (max-width: 768px) {
   .profile-page {
-    padding: 1.5rem 1rem;
+    padding: 1rem 0.5rem;
+  }
+
+  .profile-title {
+    font-size: 2rem;
+    letter-spacing: 2px;
+  }
+
+  .profile-subtitle {
+    font-size: 1rem;
   }
 
   .qr-section {
@@ -318,24 +421,48 @@
     grid-template-columns: 1fr;
   }
 
+  .qr-wrapper {
+    padding: 1rem;
+  }
+
+  .qr-wrapper canvas {
+    width: 180px !important;
+    height: 180px !important;
+  }
+
+  .card-title {
+    font-size: 1.3rem;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+  }
+
   .profile-actions {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .action-btn {
+    width: 100%;
   }
 }
 
 @media (max-width: 480px) {
-  .qr-card,
-  .status-card,
-  .details-section,
-  .events-section,
-  .workshops-section,
-  .accommodation-section,
-  .info-section {
-    padding: 1.5rem 1rem;
+  .profile-title {
+    font-size: 1.5rem;
   }
 
   .qr-wrapper canvas {
     width: 150px !important;
     height: 150px !important;
+  }
+
+  .registration-id {
+    font-size: 1rem;
+  }
+
+  .event-badge {
+    font-size: 0.85rem;
+    padding: 0.6rem 1rem;
   }
 }

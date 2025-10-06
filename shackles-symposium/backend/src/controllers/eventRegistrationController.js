@@ -20,6 +20,51 @@ exports.registerForEvent = async (req, res) => {
       });
     }
 
+    // Get user details to check registration type
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Check if user's payment is verified
+    if (user.paymentStatus !== 'verified') {
+      return res.status(403).json({
+        success: false,
+        message: 'Your payment has not been verified yet. Please wait for admin approval.'
+      });
+    }
+
+    // ✅ NEW: Check registration type restrictions
+    if (!user.registrationType) {
+      return res.status(403).json({
+        success: false,
+        message: 'Registration type not set. Please complete your payment and registration.'
+      });
+    }
+
+    // Enforce registration plan restrictions
+    const eventCategory = event.category; // 'technical', 'non-technical', 'special', 'workshop'
+    const userPlan = user.registrationType; // 'general', 'workshop', 'both'
+
+    if (userPlan === 'workshop' && eventCategory !== 'workshop') {
+      return res.status(403).json({
+        success: false,
+        message: '🚫 ACCESS DENIED: You have a Workshop plan (₹199). This allows only workshop registrations. To register for events, please upgrade to General (₹299) or Both (₹499) plan.'
+      });
+    }
+
+    if (userPlan === 'general' && eventCategory === 'workshop') {
+      return res.status(403).json({
+        success: false,
+        message: '🚫 ACCESS DENIED: You have a General Events plan (₹299). This allows only event registrations. To register for workshops, please upgrade to Both (₹499) plan or purchase Workshop plan (₹199).'
+      });
+    }
+
+    // 'both' plan has no restrictions - can register for anything
+
     // Check if user is already registered
     const existingRegistration = await EventRegistration.findOne({
       user: userId,
@@ -71,7 +116,7 @@ exports.registerForEvent = async (req, res) => {
       user: userId,
       event: eventId,
       eventName: event.name,
-      eventType: event.type,
+      eventType: event.category, // ✅ Fixed: Use category (technical/non-technical/special) not type (individual/team)
       teamMembers: teamMembers || [],
       isTeamEvent: event.isTeamEvent || false,
       paymentRequired: event.registrationFee > 0,

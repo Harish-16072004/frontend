@@ -3,6 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import Loader from '../../components/common/Loader';
 import '../../styles/Register.css';
+import general from '../../assets/images/299_qr.webp';
+import workshop from '../../assets/images/199_qr.webp';
+import both from '../../assets/images/499_qr.webp';
+import dummy from '../../assets/images/ph.webp';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -32,12 +36,12 @@ const Register = () => {
     termsAccepted: false
   });
 
-  // Payment QR codes - Replace these URLs with your actual QR code image URLs
+  // Payment QR codes - use imported image assets so the bundler resolves URLs correctly
   const qrCodes = {
-    general: '/qr-general-299.png', // Replace with actual QR for ₹299
-    workshop: '/qr-workshop-199.png', // Replace with actual QR for ₹199
-    both: '/qr-both-499.png', // Replace with actual QR for ₹499
-    dummy: '/qr-dummy.png' // Replace with dummy/placeholder image
+    general,  // 299_qr.webp (₹299)
+    workshop, // 199_qr.webp (₹199)
+    both,     // 499_qr.webp (₹499)
+    dummy     // ph.webp (placeholder)
   };
   
   // Fallback placeholder (base64 encoded simple image)

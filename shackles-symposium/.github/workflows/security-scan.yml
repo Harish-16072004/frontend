@@ -1,0 +1,232 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run security scans daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  # Dependency vulnerability scanning
+  dependency-check:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+      
+      - name: Run npm audit (Backend)
+        working-directory: ./BACKEND
+        run: |
+          npm audit --audit-level=moderate || true
+          npm audit --json > ../../security/dependency-check/backend-audit.json || true
+        continue-on-error: true
+      
+      - name: Run npm audit (Frontend)
+        working-directory: ./FRONTEND
+        run: |
+          npm audit --audit-level=moderate || true
+          npm audit --json > ../../security/dependency-check/frontend-audit.json || true
+        continue-on-error: true
+      
+      - name: OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'Shackles-Symposium'
+          path: '.'
+          format: 'ALL'
+          out: 'security/dependency-check/reports'
+        continue-on-error: true
+      
+      - name: Upload dependency check results
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-check-reports
+          path: security/dependency-check/reports
+          retention-days: 30
+
+  # Secret scanning
+  secret-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: TruffleHog Secret Scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+        continue-on-error: true
+      
+      - name: GitLeaks Secret Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+  # SAST - Static Application Security Testing
+  sast-scan:
+    name: SAST - Static Code Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+      
+      - name: Install dependencies
+        run: |
+          cd BACKEND && npm ci
+          cd ../FRONTEND && npm ci
+      
+      - name: Run ESLint Security Plugin (Backend)
+        working-directory: ./BACKEND
+        run: |
+          npm install --save-dev eslint-plugin-security
+          npx eslint . --ext .js --plugin security || true
+        continue-on-error: true
+      
+      - name: Run ESLint Security Plugin (Frontend)
+        working-directory: ./FRONTEND
+        run: |
+          npm install --save-dev eslint-plugin-security
+          npx eslint . --ext .js,.jsx --plugin security || true
+        continue-on-error: true
+      
+      - name: SonarQube SAST Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=shackles-symposium
+            -Dsonar.organization=harish-16072004
+            -Dsonar.sources=BACKEND/src,FRONTEND/src
+            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**
+        continue-on-error: true
+      
+      - name: Semgrep SAST Scan
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/nodejs
+            p/react
+            p/javascript
+        continue-on-error: true
+
+  # Container Security Scanning
+  container-scan:
+    name: Container Image Security Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Build backend Docker image
+        run: docker build -f docker/Dockerfile.backend -t shackles-backend:test ./BACKEND
+      
+      - name: Build frontend Docker image
+        run: docker build -f docker/Dockerfile.frontend -t shackles-frontend:test ./FRONTEND
+      
+      - name: Scan backend image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'shackles-backend:test'
+          format: 'sarif'
+          output: 'trivy-backend-results.sarif'
+        continue-on-error: true
+      
+      - name: Scan frontend image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'shackles-frontend:test'
+          format: 'sarif'
+          output: 'trivy-frontend-results.sarif'
+        continue-on-error: true
+      
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: '.'
+        continue-on-error: true
+
+  # License compliance check
+  license-check:
+    name: License Compliance Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+      
+      - name: Install license-checker
+        run: npm install -g license-checker
+      
+      - name: Check backend licenses
+        working-directory: ./BACKEND
+        run: |
+          npm ci
+          license-checker --summary > ../security/backend-licenses.txt || true
+        continue-on-error: true
+      
+      - name: Check frontend licenses
+        working-directory: ./FRONTEND
+        run: |
+          npm ci
+          license-checker --summary > ../security/frontend-licenses.txt || true
+        continue-on-error: true
+      
+      - name: Upload license reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: license-reports
+          path: security/*-licenses.txt
+          retention-days: 30
+
+  # Security report summary
+  security-summary:
+    name: Security Report Summary
+    runs-on: ubuntu-latest
+    needs: [dependency-check, secret-scan, sast-scan, container-scan, license-check]
+    if: always()
+    
+    steps:
+      - name: Generate security summary
+        run: |
+          echo "# Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Scan Type | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Check | ${{ needs.dependency-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Secret Scan | ${{ needs.secret-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| SAST Scan | ${{ needs.sast-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Container Scan | ${{ needs.container-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| License Check | ${{ needs.license-check.result }} |" >> $GITHUB_STEP_SUMMARY

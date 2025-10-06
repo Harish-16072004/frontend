@@ -7,14 +7,16 @@ import '../../styles/Technical.css';
 const Technical = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [registeredEvents, setRegisteredEvents] = useState(new Set());
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [registering, setRegistering] = useState(null);
+  const [technicalEvents, setTechnicalEvents] = useState([]);
   const { isAuthenticated } = useAuth();
 
-  const technicalEvents = [
+  // Fallback static events (used if API fails)
+  const staticTechnicalEvents = [
     {
-      id: 1,
-      name: 'Paper Presentation',
+      id: 'innovation-duel',
+      name: 'Innovation Duel',
       symbol: '■',
       description: 'Present innovative research papers and engineering solutions.',
       rules: [
@@ -30,8 +32,8 @@ const Technical = () => {
       },
     },
     {
-      id: 2,
-      name: 'Technical Quiz',
+      id: 'brain-busters-arena',
+      name: 'Brain Busters Arena',
       symbol: '■',
       description: 'Test your mechanical engineering knowledge across multiple rounds.',
       rules: [
@@ -47,8 +49,8 @@ const Technical = () => {
       },
     },
     {
-      id: 3,
-      name: 'CAD Modelling',
+      id: 'dimensions-forge',
+      name: 'Dimensions Forge',
       symbol: '■',
       description: 'Design and model engineering components using CAD software.',
       rules: [
@@ -64,8 +66,8 @@ const Technical = () => {
       },
     },
     {
-      id: 4,
-      name: 'Water Rocketry',
+      id: 'sky-shot',
+      name: 'Sky Shot',
       symbol: '■',
       description: 'Build and launch water rockets to achieve maximum distance and accuracy.',
       rules: [
@@ -81,8 +83,8 @@ const Technical = () => {
       },
     },
     {
-      id: 5,
-      name: 'Motor Montage',
+      id: 'engine-gamble',
+      name: 'Engine Gamble',
       symbol: '■',
       description: 'Disassemble and reassemble motors against the clock.',
       rules: [
@@ -98,8 +100,8 @@ const Technical = () => {
       },
     },
     {
-      id: 6,
-      name: 'Mech O Mania',
+      id: 'mech-showdown',
+      name: 'Mech Showdown',
       symbol: '■',
       description: 'Multiple mini-challenges testing diverse mechanical skills.',
       rules: [
@@ -115,6 +117,36 @@ const Technical = () => {
       },
     },
   ];
+
+  // Fetch events from API
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        console.log('🔍 Fetching technical events...');
+        const response = await api.get('/events?category=technical');
+        console.log('📦 API Response:', response);
+        console.log('📊 Response data:', response.data);
+        
+        const { data } = response;
+        
+        if (data && data.data && Array.isArray(data.data) && data.data.length > 0) {
+          console.log(`✅ Found ${data.data.length} technical events from API`);
+          setTechnicalEvents(data.data);
+        } else {
+          console.log('⚠️ No events found in API, using static fallback');
+          console.log('Data structure:', { hasData: !!data, hasDataProp: !!data?.data, isArray: Array.isArray(data?.data), length: data?.data?.length });
+          setTechnicalEvents(staticTechnicalEvents);
+        }
+      } catch (error) {
+        console.error('❌ Error fetching events:', error);
+        console.error('Error details:', error.response?.data || error.message);
+        setTechnicalEvents(staticTechnicalEvents);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+  }, []);
 
   // Fetch user's registered events on mount
   useEffect(() => {
@@ -136,25 +168,38 @@ const Technical = () => {
   const handleRegisterEvent = async (event, e) => {
     e.stopPropagation(); // Prevent modal from opening
     
+    console.log('🔍 Event object:', event);
+    console.log('🆔 Event ID:', event._id);
+    console.log('📋 Event keys:', Object.keys(event));
+    
     if (!isAuthenticated) {
       alert('Please login to register for events');
       return;
     }
 
-    if (registeredEvents.has(event.id.toString())) {
+    // Check if this is a real event from database (has _id) or static fallback
+    if (!event._id) {
+      console.error('❌ No _id found on event:', event);
+      alert('Event registration is currently unavailable. Events are being set up in the database. Please check back later.');
+      return;
+    }
+
+    const eventId = event._id;
+
+    if (registeredEvents.has(eventId)) {
       alert('You are already registered for this event');
       return;
     }
 
-    setRegistering(event.id);
+    setRegistering(eventId);
     try {
-      const { data } = await api.post(`/event-registrations/${event.id}/register`, {
+      const { data } = await api.post(`/event-registrations/${eventId}/register`, {
         isTeamEvent: event.teamSize ? true : false,
         teamMembers: [] // For now, empty. Can add team member modal later
       });
 
       alert(`Successfully registered for ${event.name}!`);
-      setRegisteredEvents(new Set([...registeredEvents, event.id.toString()]));
+      setRegisteredEvents(new Set([...registeredEvents, eventId]));
     } catch (error) {
       const message = error.response?.data?.message || 'Registration failed';
       alert(message);
@@ -178,11 +223,19 @@ const Technical = () => {
         </Link>
       </section>
 
+      {loading ? (
+        <div className="loading-container">
+          <p>Loading events...</p>
+        </div>
+      ) : (
       <section className="technical-grid">
         <div className="container">
-          {technicalEvents.map((event) => (
+          {technicalEvents.map((event, index) => {
+            console.log(`Event ${index}:`, event);
+            console.log(`Event ${index} _id:`, event._id);
+            return (
             <div 
-              key={event.id} 
+              key={event._id || event.id} 
               className="event-card technical"
               onClick={() => setSelectedEvent(event)}
             >
@@ -193,20 +246,24 @@ const Technical = () => {
                 <div className="event-coordinator">
                   <span className="coordinator-icon">📞</span>
                   <div>
-                    <p className="coordinator-name">{event.coordinator.name}</p>
-                    <p className="coordinator-phone">{event.coordinator.phone}</p>
+                    <p className="coordinator-name">
+                      {event.coordinators?.[0]?.name || event.coordinator?.name || 'TBA'}
+                    </p>
+                    <p className="coordinator-phone">
+                      {event.coordinators?.[0]?.phone || event.coordinator?.phone || 'TBA'}
+                    </p>
                   </div>
                 </div>
                 <div className="event-actions">
                   <button className="btn-view-details">View Details</button>
                   {isAuthenticated && (
                     <button 
-                      className={`btn-register-event ${isEventRegistered(event.id) ? 'registered' : ''}`}
+                      className={`btn-register-event ${isEventRegistered(event._id || event.id) ? 'registered' : ''}`}
                       onClick={(e) => handleRegisterEvent(event, e)}
-                      disabled={registering === event.id || isEventRegistered(event.id)}
+                      disabled={registering === (event._id || event.id) || isEventRegistered(event._id || event.id)}
                     >
-                      {registering === event.id ? 'Registering...' : 
-                       isEventRegistered(event.id) ? '✓ Registered' : 'Register Now'}
+                      {registering === (event._id || event.id) ? 'Registering...' : 
+                       isEventRegistered(event._id || event.id) ? '✓ Registered' : 'Register Now'}
                     </button>
                   )}
                   {!isAuthenticated && (
@@ -217,9 +274,11 @@ const Technical = () => {
                 </div>
               </div>
             </div>
-          ))}
+          );
+          })}
         </div>
       </section>
+      )}
 
       {selectedEvent && (
         <div className="event-modal" onClick={() => setSelectedEvent(null)}>
@@ -244,25 +303,33 @@ const Technical = () => {
 
             <div className="modal-section">
               <h3>Prizes</h3>
-              <p className="modal-prizes">{selectedEvent.prizes}</p>
+              <p className="modal-prizes">
+                {selectedEvent.prizes?.first 
+                  ? `🥇 ${selectedEvent.prizes.first} | 🥈 ${selectedEvent.prizes.second || 'TBA'} | 🥉 ${selectedEvent.prizes.third || 'TBA'}`
+                  : selectedEvent.prizes || 'To be announced'}
+              </p>
             </div>
 
             <div className="modal-section">
               <h3>Event Coordinator</h3>
               <div className="modal-coordinator">
-                <p><strong>{selectedEvent.coordinator.name}</strong></p>
-                <p>{selectedEvent.coordinator.phone}</p>
+                <p><strong>
+                  {selectedEvent.coordinators?.[0]?.name || selectedEvent.coordinator?.name || 'TBA'}
+                </strong></p>
+                <p>
+                  {selectedEvent.coordinators?.[0]?.phone || selectedEvent.coordinator?.phone || 'TBA'}
+                </p>
               </div>
             </div>
 
             {isAuthenticated && (
               <button 
-                className={`btn-register-modal ${isEventRegistered(selectedEvent.id) ? 'registered' : ''}`}
+                className={`btn-register-modal ${isEventRegistered(selectedEvent._id || selectedEvent.id) ? 'registered' : ''}`}
                 onClick={(e) => handleRegisterEvent(selectedEvent, e)}
-                disabled={registering === selectedEvent.id || isEventRegistered(selectedEvent.id)}
+                disabled={registering === (selectedEvent._id || selectedEvent.id) || isEventRegistered(selectedEvent._id || selectedEvent.id)}
               >
-                {registering === selectedEvent.id ? 'Registering...' : 
-                 isEventRegistered(selectedEvent.id) ? '✓ Already Registered' : 'Register for this Event'}
+                {registering === (selectedEvent._id || selectedEvent.id) ? 'Registering...' : 
+                 isEventRegistered(selectedEvent._id || selectedEvent.id) ? '✓ Already Registered' : 'Register for this Event'}
               </button>
             )}
             {!isAuthenticated && (

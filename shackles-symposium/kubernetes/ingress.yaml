@@ -1,0 +1,86 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: shackles-ingress
+  namespace: shackles-symposium
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+spec:
+  tls:
+  - hosts:
+    - shackles-symposium.com
+    - www.shackles-symposium.com
+    - api.shackles-symposium.com
+    secretName: shackles-tls-cert
+  rules:
+  # Frontend routing
+  - host: shackles-symposium.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
+  
+  - host: www.shackles-symposium.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
+  
+  # Backend API routing
+  - host: api.shackles-symposium.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 80
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: shackles-symposium
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shackles-config
+  namespace: shackles-symposium
+data:
+  api-base-url: "https://api.shackles-symposium.com/api"
+  aws-region: "us-east-1"
+  aws-s3-bucket: "shackles-symposium-uploads"
+  frontend-url: "https://shackles-symposium.com"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: shackles-secrets
+  namespace: shackles-symposium
+type: Opaque
+stringData:
+  mongodb-uri: "mongodb+srv://username:password@cluster.mongodb.net/shackles_symposium"
+  redis-password: "change-this-redis-password"
+  jwt-secret: "change-this-super-secret-jwt-key"
+  aws-access-key-id: "your-aws-access-key-id"
+  aws-secret-access-key: "your-aws-secret-access-key"

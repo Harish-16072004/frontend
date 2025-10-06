@@ -158,3 +158,111 @@ exports.getWorkshopRegistrations = async (req, res) => {
     });
   }
 };
+
+// @desc    Register for a workshop
+// @route   POST /api/v1/workshops/:id/register
+// @access  Private
+exports.registerWorkshop = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const workshopId = req.params.id;
+
+    // Get workshop details
+    const workshop = await Workshop.findById(workshopId);
+    if (!workshop) {
+      return res.status(404).json({
+        success: false,
+        message: 'Workshop not found'
+      });
+    }
+
+    // Check if workshop is active
+    if (!workshop.isActive) {
+      return res.status(400).json({
+        success: false,
+        message: 'This workshop is not available for registration'
+      });
+    }
+
+    // Check if workshop is full
+    if (workshop.isFull()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Workshop is full. No more seats available.'
+      });
+    }
+
+    // Check if registration deadline has passed
+    if (!workshop.isRegistrationOpen()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Registration deadline has passed for this workshop'
+      });
+    }
+
+    // Check if user already registered
+    const existingRegistration = await Registration.findOne({
+      user: userId,
+      workshop: workshopId,
+      type: 'workshop'
+    });
+
+    if (existingRegistration) {
+      return res.status(400).json({
+        success: false,
+        message: 'You are already registered for this workshop'
+      });
+    }
+
+    // Get user details for payment verification
+    const User = require('../models/User');
+    const user = await User.findById(userId);
+
+    // Check if user has verified payment
+    if (user.paymentStatus !== 'verified') {
+      return res.status(403).json({
+        success: false,
+        message: 'Please complete payment verification before registering for workshops'
+      });
+    }
+
+    // Check user's registration type (payment plan)
+    const userPlan = user.registrationType; // 'workshop', 'general', or 'both'
+
+    // Enforce workshop access based on payment plan
+    if (userPlan === 'general') {
+      return res.status(403).json({
+        success: false,
+        message: '🚫 ACCESS DENIED: General plan (₹299) only allows event registrations. Please upgrade to Workshop (₹199) or Both (₹499) plan to access workshops.'
+      });
+    }
+
+    // Create registration
+    const registrationNumber = `WS-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+    
+    const registration = await Registration.create({
+      registrationNumber,
+      user: userId,
+      workshop: workshopId,
+      type: 'workshop',
+      amount: workshop.registrationFee,
+      paymentStatus: 'paid', // Assuming user already paid symposium fee
+      status: 'confirmed'
+    });
+
+    // Increment workshop participant count
+    await workshop.incrementParticipants(1);
+
+    res.status(201).json({
+      success: true,
+      message: `Successfully registered for ${workshop.title}!`,
+      data: registration
+    });
+  } catch (error) {
+    console.error('Workshop registration error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};

@@ -141,38 +141,46 @@ exports.register = async (req, res, next) => {
 // @access  Public
 exports.login = async (req, res, next) => {
   try {
+    console.log('🔐 Login attempt:', req.body);
     const { email, password } = req.body;
 
     // Validate email & password
     if (!email || !password) {
+      console.log('❌ Missing email or password');
       return res.status(400).json({
         success: false,
         message: 'Please provide email and password'
       });
     }
 
+    console.log('🔍 Looking for user with email:', email);
     // Check for user
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
+      console.log('❌ User not found');
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
       });
     }
 
+    console.log('✅ User found, checking password...');
     // Check if password matches
     const isMatch = await user.matchPassword(password);
 
     if (!isMatch) {
+      console.log('❌ Password mismatch');
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
       });
     }
 
+    console.log('✅ Login successful!');
     sendTokenResponse(user, 200, res, 'Login successful');
   } catch (error) {
+    console.error('❌ Login error:', error);
     res.status(500).json({
       success: false,
       message: error.message
