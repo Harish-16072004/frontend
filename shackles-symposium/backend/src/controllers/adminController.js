@@ -485,16 +485,19 @@ exports.verifyPayment = async (req, res) => {
     const participantId = await generateParticipantId(user.registrationType);
     console.log(`✅ Generated participant ID: ${participantId} for ${user.email}`);
 
-    // Generate QR code and upload to S3
+    // Generate secure QR token
+    const qrToken = user.generateQRToken(30); // Valid for 30 days
+    console.log(`🔐 Generated secure QR token (version ${user.qrTokenVersion})`);
+
+    // Generate QR code with token and upload to S3
     let qrCodeUrl = null;
     let qrCodeKey = null;
     let qrBase64 = null;
 
     try {
       const qrResult = await generateParticipantQR(participantId, {
-        name: user.name,
-        email: user.email,
-        registrationType: user.registrationType
+        qrToken: qrToken,
+        qrTokenVersion: user.qrTokenVersion
       });
 
       qrCodeUrl = qrResult.qrCodeUrl;
@@ -502,9 +505,8 @@ exports.verifyPayment = async (req, res) => {
 
       // Also generate base64 for email
       qrBase64 = await generateParticipantQRBase64(participantId, {
-        name: user.name,
-        email: user.email,
-        registrationType: user.registrationType
+        qrToken: qrToken,
+        qrTokenVersion: user.qrTokenVersion
       });
 
       console.log(`✅ QR code generated and uploaded to S3: ${qrCodeUrl}`);
@@ -870,6 +872,7 @@ exports.getParticipantById = async (req, res) => {
 exports.regenerateQRCode = async (req, res) => {
   try {
     const { participantId } = req.params;
+    const { revoke = false } = req.body; // Option to revoke old token
 
     const user = await User.findOne({ participantId });
 
@@ -887,11 +890,20 @@ exports.regenerateQRCode = async (req, res) => {
       });
     }
 
-    // Generate new QR code
+    // Revoke old token if requested (security measure)
+    if (revoke) {
+      user.revokeQRToken();
+      console.log(`🔒 Revoked old QR token for security`);
+    }
+
+    // Generate new secure QR token
+    const qrToken = user.generateQRToken(30); // Valid for 30 days
+    console.log(`🔐 Generated new secure QR token (version ${user.qrTokenVersion})`);
+
+    // Generate new QR code with new token
     const qrResult = await generateParticipantQR(user.participantId, {
-      name: user.name,
-      email: user.email,
-      registrationType: user.registrationType
+      qrToken: qrToken,
+      qrTokenVersion: user.qrTokenVersion
     });
 
     // Update user
@@ -906,7 +918,9 @@ exports.regenerateQRCode = async (req, res) => {
       message: 'QR code regenerated successfully',
       data: {
         participantId: user.participantId,
-        qrCodeUrl: user.qrCode
+        qrCodeUrl: user.qrCode,
+        tokenVersion: user.qrTokenVersion,
+        expiresAt: user.qrTokenExpiry
       }
     });
 

@@ -100,15 +100,13 @@ exports.generateRegistrationQR = async (registrationId, options = {}) => {
  */
 exports.generateParticipantQR = async (participantId, userData = {}) => {
   try {
-    // Data to encode in QR code
+    // SECURITY: Only encode minimal, non-sensitive data
+    // The token will be validated server-side to get full participant details
     const qrData = {
-      participantId,
-      name: userData.name,
-      email: userData.email,
-      registrationType: userData.registrationType,
-      generatedAt: new Date().toISOString(),
-      eventName: 'SHACKLES 2025',
-      department: 'Mechanical Engineering, ACGCET'
+      t: userData.qrToken,  // Secure token (shortened key for smaller QR)
+      p: participantId,     // Participant ID
+      v: userData.qrTokenVersion || 1,  // Version for revocation
+      e: 'SHACKLES2025'     // Event identifier
     };
 
     // Generate QR code as buffer
@@ -153,13 +151,12 @@ exports.generateParticipantQR = async (participantId, userData = {}) => {
  */
 exports.generateParticipantQRBase64 = async (participantId, userData = {}) => {
   try {
+    // SECURITY: Only encode minimal, non-sensitive data
     const qrData = {
-      participantId,
-      name: userData.name,
-      email: userData.email,
-      registrationType: userData.registrationType,
-      generatedAt: new Date().toISOString(),
-      eventName: 'SHACKLES 2025'
+      t: userData.qrToken,
+      p: participantId,
+      v: userData.qrTokenVersion || 1,
+      e: 'SHACKLES2025'
     };
 
     const qrCodeDataURL = await QRCode.toDataURL(JSON.stringify(qrData), {

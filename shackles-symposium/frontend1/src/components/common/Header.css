@@ -1,0 +1,355 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.95);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  border-bottom: 2px solid var(--guard-pink);
+  box-shadow: 0 4px 20px rgba(227, 27, 108, 0.3);
+}
+
+.header-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+  white-space: nowrap;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.logo-text {
+  font-family: 'GameOfSquids', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  color: var(--guard-pink);
+  text-shadow: 0 0 20px rgba(227, 27, 108, 0.6);
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.logo-year {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  color: var(--player-green);
+  font-weight: 700;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav a {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  position: relative;
+  transition: color 0.3s ease;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.nav a::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--accent-blue);
+  transition: width 0.3s ease;
+}
+
+.nav a:hover,
+.nav a:focus {
+  color: var(--accent-blue) !important;
+}
+
+.nav a:hover::after {
+  width: 100%;
+}
+
+.profile-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(10, 215, 161, 0.1);
+  border: 1px solid var(--player-green);
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.profile-link:hover {
+  background: rgba(10, 215, 161, 0.2);
+  transform: translateY(-2px);
+}
+
+.user-name {
+  color: var(--player-green);
+}
+
+.admin-link {
+  background: rgba(227, 27, 108, 0.1);
+  border: 1px solid var(--guard-pink);
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.admin-link:hover {
+  background: rgba(227, 27, 108, 0.2);
+  color: var(--guard-pink);
+  transform: translateY(-2px);
+}
+
+.btn-login,
+.btn-register,
+.btn-logout {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 0.5rem 1.5rem;
+  border-radius: 25px;
+  border: 2px solid;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none !important;
+  display: inline-block;
+}
+
+/* Remove all underlines from Link components styled as buttons */
+a.btn-login,
+a.btn-login:link,
+a.btn-login:visited,
+a.btn-login:hover,
+a.btn-login:active,
+a.btn-login:focus {
+  text-decoration: none !important;
+  outline: none !important;
+}
+
+.btn-login {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.95);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+/* Override maintenance styles for login button */
+.btn-login.maintenance-btn,
+.btn-login.maintenance-link {
+  background: transparent !important;
+}
+
+.btn-login.maintenance-btn:hover,
+.btn-login.maintenance-link:hover {
+  background: transparent !important;
+  border-color: #dc3545 !important;
+  color: #dc3545 !important;
+  transform: translateY(-5px) !important;
+  box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3) !important;
+}
+
+.btn-login:hover {
+  background: transparent;
+  border-color: #dc3545;
+  color: #dc3545 !important;
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
+}
+
+.btn-login:focus,
+.btn-login:active {
+  outline: none;
+}
+
+.btn-login:active {
+  transform: translateY(-3px);
+}
+
+.btn-register {
+  background: var(--guard-pink);
+  border-color: var(--guard-pink);
+  color: white;
+}
+
+.btn-register:hover {
+  background: transparent;
+  color: var(--guard-pink);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(227, 27, 108, 0.4);
+}
+
+.btn-logout {
+  background: transparent;
+  border-color: var(--vip-gold);
+  color: var(--vip-gold);
+}
+
+.btn-logout:hover {
+  background: var(--vip-gold);
+  color: var(--bg-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 191, 0, 0.4);
+}
+
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 1001;
+}
+
+.menu-toggle span {
+  width: 30px;
+  height: 3px;
+  background: white;
+  transition: all 0.3s ease;
+  border-radius: 3px;
+}
+
+.menu-toggle.active span:nth-child(1) {
+  transform: rotate(45deg) translate(8px, 8px);
+}
+
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(8px, -8px);
+}
+
+@media (max-width: 968px) {
+  .header-container {
+    padding: 1rem;
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
+
+  .nav {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.98);
+    flex-direction: column;
+    padding: 6rem 2rem 2rem;
+    gap: 1.5rem;
+    align-items: flex-start;
+    border-left: 2px solid var(--guard-pink);
+    transition: right 0.3s ease;
+    overflow-y: auto;
+  }
+
+  .nav.active {
+    right: 0;
+  }
+
+  .nav a {
+    font-size: 1.3rem;
+    width: 100%;
+    padding: 0.5rem 0;
+  }
+
+  .nav a:hover,
+  .nav a:focus {
+    color: var(--accent-blue) !important;
+  }
+
+  .nav a::after {
+    bottom: 0;
+  }
+
+  .profile-link,
+  .admin-link {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn-login,
+  .btn-register,
+  .btn-logout {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-text {
+    font-size: 1.3rem;
+  }
+
+  .logo-year {
+    font-size: 0.9rem;
+  }
+
+  .nav {
+    width: 100%;
+    right: -100%;
+  }
+}
+
+/* Maintenance Button Styles */
+.maintenance-btn,
+.maintenance-link {
+  position: relative;
+  opacity: 0.7;
+  pointer-events: auto;
+}
+
+.maintenance-btn:hover,
+.maintenance-link:hover {
+  opacity: 1;
+  background: linear-gradient(45deg, #ff6b9d, #4ecdc4) !important;
+  transform: translateY(-2px);
+}
+
+.maintenance-btn::after,
+.maintenance-link::after {
+  content: "🔧";
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 0.8rem;
+  background: #ff6b9d;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}

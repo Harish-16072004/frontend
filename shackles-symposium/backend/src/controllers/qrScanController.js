@@ -200,14 +200,15 @@ exports.checkInParticipant = async (req, res) => {
 };
 
 /**
- * @desc    Issue registration kit after QR scan
- * @route   POST /api/v1/attendance/issue-kit
+ * @desc    Issue registration kit after QR scan (Workshop Day or Events Day)
+ * @route   POST /api/v1/qr-scan/issue-kit
  * @access  Private (Coordinator/Admin)
  */
 exports.issueKit = async (req, res) => {
   try {
     const { 
-      participantId, 
+      participantId,
+      kitDay, // 'workshop' or 'events'
       collectionPoint = 'main-desk',
       signature,
       deviceInfo 
@@ -218,6 +219,14 @@ exports.issueKit = async (req, res) => {
         success: false,
         error: 'MISSING_PARTICIPANT_ID',
         message: 'Participant ID is required'
+      });
+    }
+    
+    if (!kitDay || !['workshop', 'events'].includes(kitDay)) {
+      return res.status(400).json({
+        success: false,
+        error: 'INVALID_KIT_DAY',
+        message: 'Kit day must be either "workshop" or "events"'
       });
     }
     
@@ -242,63 +251,146 @@ exports.issueKit = async (req, res) => {
       });
     }
     
-    // Check if kit already issued
-    const existingKit = await KitDistribution.isKitIssued(participantId);
+    // Get or create kit distribution record
+    let kitRecord = await KitDistribution.findOne({ participantId });
     
-    if (existingKit) {
-      const kitDetails = await KitDistribution.getKitDetails(participantId);
-      return res.status(200).json({
-        success: true,
-        alreadyIssued: true,
-        message: '⚠️ Kit already issued to this participant',
-        kit: {
-          issuedAt: kitDetails.issuedAt,
-          issuedBy: kitDetails.issuedBy,
-          idCardNumber: kitDetails.idCardNumber,
-          contents: kitDetails.kitContents
-        }
+    if (!kitRecord) {
+      kitRecord = new KitDistribution({
+        participantId: user.participantId,
+        user: user._id,
+        registrationType: user.registrationType
       });
     }
     
-    // Get kit contents based on registration type
-    const kitContents = KitDistribution.getKitContentsByType(user.registrationType);
-    
-    // Create kit distribution record
-    const kit = await KitDistribution.create({
-      participantId: user.participantId,
-      user: user._id,
-      kitType: user.registrationType,
-      kitContents,
-      issuedBy: req.user.id,
-      issuanceMethod: 'qr-scan',
-      collectionPoint,
-      participantSignature: signature,
-      deviceInfo
-    });
-    
-    // Populate kit details
-    await kit.populate([
-      { path: 'user', select: 'participantId name email phone college department' },
-      { path: 'issuedBy', select: 'name email' }
-    ]);
-    
-    res.status(201).json({
-      success: true,
-      message: '✅ Registration kit issued successfully',
-      kit: {
-        id: kit._id,
-        idCardNumber: kit.idCardNumber,
-        participant: {
-          id: user.participantId,
-          name: user.name,
-          college: user.college,
-          registrationType: user.registrationType
-        },
-        contents: kit.kitContents,
-        issuedAt: kit.issuedAt,
-        issuedBy: kit.issuedBy
+    // Check eligibility and issue appropriate kit
+    if (kitDay === 'workshop') {
+      // Check eligibility for workshop kit
+      if (!kitRecord.canReceiveWorkshopKit()) {
+        return res.status(403).json({
+          success: false,
+          error: 'NOT_ELIGIBLE_WORKSHOP',
+          message: `❌ Not eligible for workshop day kit.\n\nYou are registered as: ${user.registrationType.toUpperCase()}\n\nOnly WORKSHOP or BOTH registrations can receive workshop day kit.`
+        });
       }
-    });
+      
+      // Check if already issued
+      if (kitRecord.workshopDayKit.issued) {
+        return res.status(200).json({
+          success: true,
+          alreadyIssued: true,
+          message: '⚠️ Workshop day kit already issued to this participant',
+          kit: {
+            idCardNumber: kitRecord.workshopDayKit.idCardNumber,
+            issuedAt: kitRecord.workshopDayKit.issuedAt,
+            contents: kitRecord.workshopDayKit.contents
+          }
+        });
+      }
+      
+      // Issue workshop day kit
+      const workshopContents = KitDistribution.getWorkshopDayKitContents();
+      kitRecord.workshopDayKit = {
+        issued: true,
+        issuedAt: new Date(),
+        issuedBy: req.user.id,
+        contents: workshopContents,
+        issuanceMethod: 'qr-scan',
+        collectionPoint: collectionPoint || 'workshop-desk',
+        participantSignature: signature,
+        deviceInfo
+      };
+      
+      await kitRecord.save();
+      
+      // Populate details
+      await kitRecord.populate([
+        { path: 'user', select: 'participantId name email phone college' },
+        { path: 'workshopDayKit.issuedBy', select: 'name email' }
+      ]);
+      
+      return res.status(201).json({
+        success: true,
+        message: '✅ Workshop day kit issued successfully',
+        kit: {
+          id: kitRecord._id,
+          kitDay: 'workshop',
+          idCardNumber: kitRecord.workshopDayKit.idCardNumber,
+          participant: {
+            id: user.participantId,
+            name: user.name,
+            college: user.college,
+            registrationType: user.registrationType
+          },
+          contents: kitRecord.workshopDayKit.contents,
+          issuedAt: kitRecord.workshopDayKit.issuedAt,
+          issuedBy: kitRecord.workshopDayKit.issuedBy
+        }
+      });
+      
+    } else if (kitDay === 'events') {
+      // Check eligibility for events kit
+      if (!kitRecord.canReceiveEventsKit()) {
+        return res.status(403).json({
+          success: false,
+          error: 'NOT_ELIGIBLE_EVENTS',
+          message: `❌ Not eligible for events day kit.\n\nYou are registered as: ${user.registrationType.toUpperCase()}\n\nOnly GENERAL or BOTH registrations can receive events day kit.`
+        });
+      }
+      
+      // Check if already issued
+      if (kitRecord.eventsDayKit.issued) {
+        return res.status(200).json({
+          success: true,
+          alreadyIssued: true,
+          message: '⚠️ Events day kit already issued to this participant',
+          kit: {
+            idCardNumber: kitRecord.eventsDayKit.idCardNumber,
+            issuedAt: kitRecord.eventsDayKit.issuedAt,
+            contents: kitRecord.eventsDayKit.contents
+          }
+        });
+      }
+      
+      // Issue events day kit
+      const eventsContents = KitDistribution.getEventsDayKitContents();
+      kitRecord.eventsDayKit = {
+        issued: true,
+        issuedAt: new Date(),
+        issuedBy: req.user.id,
+        contents: eventsContents,
+        issuanceMethod: 'qr-scan',
+        collectionPoint: collectionPoint || 'main-desk',
+        participantSignature: signature,
+        deviceInfo
+      };
+      
+      await kitRecord.save();
+      
+      // Populate details
+      await kitRecord.populate([
+        { path: 'user', select: 'participantId name email phone college' },
+        { path: 'eventsDayKit.issuedBy', select: 'name email' }
+      ]);
+      
+      return res.status(201).json({
+        success: true,
+        message: '✅ Events day kit issued successfully',
+        kit: {
+          id: kitRecord._id,
+          kitDay: 'events',
+          idCardNumber: kitRecord.eventsDayKit.idCardNumber,
+          participant: {
+            id: user.participantId,
+            name: user.name,
+            college: user.college,
+            registrationType: user.registrationType
+          },
+          contents: kitRecord.eventsDayKit.contents,
+          issuedAt: kitRecord.eventsDayKit.issuedAt,
+          issuedBy: kitRecord.eventsDayKit.issuedBy
+        }
+      });
+    }
   } catch (error) {
     console.error('Kit issuance error:', error);
     res.status(500).json({
@@ -311,7 +403,7 @@ exports.issueKit = async (req, res) => {
 
 /**
  * @desc    Combined QR scan: Check-in + Kit issuance
- * @route   POST /api/v1/attendance/scan-and-checkin
+ * @route   POST /api/v1/qr-scan/scan-and-checkin
  * @access  Private (Coordinator/Admin)
  */
 exports.scanAndCheckIn = async (req, res) => {
@@ -321,6 +413,7 @@ exports.scanAndCheckIn = async (req, res) => {
       eventId, 
       eventType = 'event',
       issueKit = false,
+      kitDay = null, // 'workshop' or 'events'
       collectionPoint = 'main-desk',
       signature,
       location,
@@ -424,39 +517,94 @@ exports.scanAndCheckIn = async (req, res) => {
       };
     }
     
-    // Step 3: Issue kit (if requested)
-    if (issueKit) {
-      const existingKit = await KitDistribution.isKitIssued(validation.participant.id);
+    // Step 3: Issue kit (if requested and kitDay specified)
+    if (issueKit && kitDay) {
+      let kitRecord = await KitDistribution.findOne({ participantId: validation.participant.id });
       
-      if (!existingKit) {
-        const kitContents = KitDistribution.getKitContentsByType(user.registrationType);
-        
-        const kit = await KitDistribution.create({
-          participantId: user.participantId,
+      if (!kitRecord) {
+        kitRecord = new KitDistribution({
+          participantId: validation.participant.id,
           user: user._id,
-          kitType: user.registrationType,
-          kitContents,
-          issuedBy: req.user.id,
-          issuanceMethod: 'qr-scan',
-          collectionPoint,
-          participantSignature: signature,
-          deviceInfo
+          registrationType: user.registrationType
         });
-        
-        result.kit = {
-          status: 'issued',
-          idCardNumber: kit.idCardNumber,
-          contents: kit.kitContents,
-          message: '✅ Kit issued successfully'
-        };
-      } else {
-        const kitDetails = await KitDistribution.getKitDetails(validation.participant.id);
-        result.kit = {
-          status: 'already_issued',
-          idCardNumber: kitDetails.idCardNumber,
-          issuedAt: kitDetails.issuedAt,
-          message: '⚠️ Kit already issued'
-        };
+      }
+      
+      if (kitDay === 'workshop') {
+        if (kitRecord.canReceiveWorkshopKit() && !kitRecord.workshopDayKit.issued) {
+          const workshopContents = KitDistribution.getWorkshopDayKitContents();
+          kitRecord.workshopDayKit = {
+            issued: true,
+            issuedAt: new Date(),
+            issuedBy: req.user.id,
+            contents: workshopContents,
+            issuanceMethod: 'qr-scan',
+            collectionPoint: collectionPoint || 'workshop-desk',
+            participantSignature: signature,
+            deviceInfo
+          };
+          
+          await kitRecord.save();
+          
+          result.kit = {
+            status: 'issued',
+            kitDay: 'workshop',
+            idCardNumber: kitRecord.workshopDayKit.idCardNumber,
+            contents: kitRecord.workshopDayKit.contents,
+            message: '✅ Workshop day kit issued successfully'
+          };
+        } else if (kitRecord.workshopDayKit.issued) {
+          result.kit = {
+            status: 'already_issued',
+            kitDay: 'workshop',
+            idCardNumber: kitRecord.workshopDayKit.idCardNumber,
+            issuedAt: kitRecord.workshopDayKit.issuedAt,
+            message: '⚠️ Workshop day kit already issued'
+          };
+        } else {
+          result.kit = {
+            status: 'not_eligible',
+            kitDay: 'workshop',
+            message: '❌ Not eligible for workshop day kit'
+          };
+        }
+      } else if (kitDay === 'events') {
+        if (kitRecord.canReceiveEventsKit() && !kitRecord.eventsDayKit.issued) {
+          const eventsContents = KitDistribution.getEventsDayKitContents();
+          kitRecord.eventsDayKit = {
+            issued: true,
+            issuedAt: new Date(),
+            issuedBy: req.user.id,
+            contents: eventsContents,
+            issuanceMethod: 'qr-scan',
+            collectionPoint: collectionPoint || 'main-desk',
+            participantSignature: signature,
+            deviceInfo
+          };
+          
+          await kitRecord.save();
+          
+          result.kit = {
+            status: 'issued',
+            kitDay: 'events',
+            idCardNumber: kitRecord.eventsDayKit.idCardNumber,
+            contents: kitRecord.eventsDayKit.contents,
+            message: '✅ Events day kit issued successfully'
+          };
+        } else if (kitRecord.eventsDayKit.issued) {
+          result.kit = {
+            status: 'already_issued',
+            kitDay: 'events',
+            idCardNumber: kitRecord.eventsDayKit.idCardNumber,
+            issuedAt: kitRecord.eventsDayKit.issuedAt,
+            message: '⚠️ Events day kit already issued'
+          };
+        } else {
+          result.kit = {
+            status: 'not_eligible',
+            kitDay: 'events',
+            message: '❌ Not eligible for events day kit'
+          };
+        }
       }
     }
     
@@ -477,7 +625,7 @@ exports.scanAndCheckIn = async (req, res) => {
 
 /**
  * @desc    Check kit distribution status
- * @route   GET /api/v1/attendance/kit-status/:participantId
+ * @route   GET /api/v1/qr-scan/kit-status/:participantId
  * @access  Private (Coordinator/Admin)
  */
 exports.getKitStatus = async (req, res) => {
@@ -495,38 +643,61 @@ exports.getKitStatus = async (req, res) => {
       });
     }
     
-    const kitDetails = await KitDistribution.getKitDetails(participantId);
+    const kitRecord = await KitDistribution.getKitDetails(participantId);
     
-    if (!kitDetails) {
+    if (!kitRecord) {
       return res.status(200).json({
         success: true,
-        kitIssued: false,
         participant: {
           id: user.participantId,
           name: user.name,
           registrationType: user.registrationType
         },
-        message: 'Kit not yet issued'
+        workshopKit: {
+          eligible: ['workshop', 'both'].includes(user.registrationType),
+          issued: false,
+          message: 'Workshop day kit not yet issued'
+        },
+        eventsKit: {
+          eligible: ['general', 'both'].includes(user.registrationType),
+          issued: false,
+          message: 'Events day kit not yet issued'
+        },
+        totalKitsIssued: 0
       });
     }
     
+    const status = kitRecord.getKitStatus();
+    
     res.status(200).json({
       success: true,
-      kitIssued: true,
-      kit: {
-        idCardNumber: kitDetails.idCardNumber,
-        kitType: kitDetails.kitType,
-        contents: kitDetails.kitContents,
-        issuedAt: kitDetails.issuedAt,
-        issuedBy: kitDetails.issuedBy,
-        collectionPoint: kitDetails.collectionPoint
-      },
       participant: {
         id: user.participantId,
         name: user.name,
         email: user.email,
         registrationType: user.registrationType
-      }
+      },
+      workshopKit: {
+        eligible: status.workshopKit.eligible,
+        issued: status.workshopKit.issued,
+        idCardNumber: status.workshopKit.idCardNumber,
+        issuedAt: kitRecord.workshopDayKit.issuedAt,
+        issuedBy: kitRecord.workshopDayKit.issuedBy,
+        contents: kitRecord.workshopDayKit.contents,
+        collectionPoint: kitRecord.workshopDayKit.collectionPoint,
+        message: status.workshopKit.issued ? '✅ Workshop day kit issued' : 'Workshop day kit not yet issued'
+      },
+      eventsKit: {
+        eligible: status.eventsKit.eligible,
+        issued: status.eventsKit.issued,
+        idCardNumber: status.eventsKit.idCardNumber,
+        issuedAt: kitRecord.eventsDayKit.issuedAt,
+        issuedBy: kitRecord.eventsDayKit.issuedBy,
+        contents: kitRecord.eventsDayKit.contents,
+        collectionPoint: kitRecord.eventsDayKit.collectionPoint,
+        message: status.eventsKit.issued ? '✅ Events day kit issued' : 'Events day kit not yet issued'
+      },
+      totalKitsIssued: status.totalKitsIssued
     });
   } catch (error) {
     console.error('Get kit status error:', error);

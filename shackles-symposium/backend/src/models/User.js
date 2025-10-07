@@ -141,6 +141,27 @@ const UserSchema = new mongoose.Schema({
     type: String
     // No default value - field added only on verification
   },
+  // Dynamic QR Code Security Token
+  qrToken: {
+    type: String,
+    unique: true,
+    sparse: true,
+    index: true
+  },
+  qrTokenExpiry: {
+    type: Date
+  },
+  qrTokenVersion: {
+    type: Number,
+    default: 1
+  },
+  lastQRScan: {
+    type: Date
+  },
+  qrScanCount: {
+    type: Number,
+    default: 0
+  },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
   verificationToken: String,
@@ -199,6 +220,54 @@ UserSchema.methods.getVerificationToken = function() {
   this.verificationTokenExpire = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
   
   return verificationToken;
+};
+
+// Generate secure dynamic QR token
+UserSchema.methods.generateQRToken = function(expiryDays = 30) {
+  // Generate cryptographically secure random token
+  const token = crypto.randomBytes(32).toString('hex');
+  
+  // Hash the token before storing (security best practice)
+  this.qrToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+  
+  // Set expiry (default 30 days from now)
+  this.qrTokenExpiry = Date.now() + expiryDays * 24 * 60 * 60 * 1000;
+  
+  // Increment version (for token revocation tracking)
+  this.qrTokenVersion = (this.qrTokenVersion || 0) + 1;
+  
+  // Return the unhashed token (this goes in QR code)
+  return token;
+};
+
+// Validate QR token
+UserSchema.methods.validateQRToken = function(token) {
+  // Hash the provided token
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+  
+  // Check if token matches and hasn't expired
+  if (this.qrToken !== hashedToken) {
+    return { valid: false, reason: 'INVALID_TOKEN' };
+  }
+  
+  if (this.qrTokenExpiry && Date.now() > this.qrTokenExpiry) {
+    return { valid: false, reason: 'TOKEN_EXPIRED' };
+  }
+  
+  return { valid: true };
+};
+
+// Revoke QR token (for security - if QR is compromised)
+UserSchema.methods.revokeQRToken = function() {
+  this.qrToken = null;
+  this.qrTokenExpiry = null;
+  this.qrTokenVersion = (this.qrTokenVersion || 0) + 1;
 };
 
 module.exports = mongoose.model('User', UserSchema);

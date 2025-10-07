@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../../services/api';
 import '../../styles/ForgotPassword.css';
 
 const ForgotPassword = () => {
@@ -25,11 +26,19 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      // API call would go here
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setSuccess(true);
+      const { data } = await api.post('/auth/forgot-password', { email });
+      
+      if (data.success) {
+        setSuccess(true);
+      } else {
+        setError(data.message || 'Failed to send reset link. Please try again.');
+      }
     } catch (err) {
-      setError('Failed to send reset link. Please try again.');
+      console.error('Forgot password error:', err);
+      setError(
+        err.response?.data?.message || 
+        'Failed to send reset link. Please check your email and try again.'
+      );
     } finally {
       setLoading(false);
     }

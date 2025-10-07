@@ -307,8 +307,8 @@ exports.forgotPassword = async (req, res, next) => {
     try {
       await sendEmail({
         to: user.email,
-        subject: 'Password Reset Request - SHACKLES 2025',
-        template: 'resetPassword',
+        subject: '🔒 Password Reset Request - SHACKLES 2025',
+        template: 'password-reset',
         context: {
           name: user.name,
           resetUrl
@@ -317,7 +317,7 @@ exports.forgotPassword = async (req, res, next) => {
 
       res.status(200).json({
         success: true,
-        message: 'Password reset email sent'
+        message: 'Password reset email sent successfully. Please check your inbox.'
       });
     } catch (err) {
       console.log(err);

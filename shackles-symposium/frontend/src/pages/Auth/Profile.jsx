@@ -17,25 +17,78 @@ const Profile = () => {
     // Fetch user profile data
     const fetchProfile = async () => {
       try {
-        // Fetch user's event registrations
-        const { data: regData } = await api.get('/event-registrations/my-registrations');
-        setRegistrations(regData.data || []);
-
-        // Fetch user's full profile
+        // Fetch user's full profile first
         const { data: userData } = await api.get('/auth/me');
+        console.log('👤 User Data:', userData.data);
+
+        // Fetch BOTH event registrations and workshop registrations
+        const events = [];
+        const workshops = [];
+
+        // 1. Fetch from event-registrations endpoint (for events)
+        try {
+          const { data: eventRegsResp } = await api.get('/event-registrations/my-registrations');
+          console.log('🎯 Event Registrations:', eventRegsResp);
+          
+          eventRegsResp.data?.forEach((reg, index) => {
+            console.log(`Event Registration ${index + 1}:`, reg);
+            if (reg.event) {
+              const eName = reg.event.name || reg.event.title || reg.event;
+              console.log(`  ✅ Adding event: ${eName}`);
+              events.push(eName);
+            }
+          });
+        } catch (eventError) {
+          console.warn('⚠️ Could not fetch event registrations:', eventError.message);
+        }
+
+        // 2. Fetch from registrations endpoint (for workshops and events)
+        try {
+          const { data: registrationsResp } = await api.get('/registrations/my-registrations');
+          console.log('� Registrations Data:', registrationsResp);
+          setRegistrations(registrationsResp.data || []);
+
+          registrationsResp.data?.forEach((reg, index) => {
+            console.log(`Registration ${index + 1}:`, reg);
+            console.log(`  - type: ${reg.type}`);
+
+            if (reg.type === 'workshop' && reg.workshop) {
+              const wName = reg.workshop.title || reg.workshop.name || reg.workshop;
+              console.log(`  ✅ Adding workshop: ${wName}`);
+              workshops.push(wName);
+            } else if (reg.type === 'event' && reg.event) {
+              const eName = reg.event.name || reg.event.title || reg.event;
+              console.log(`  ✅ Adding event from registrations: ${eName}`);
+              // Only add if not already in events array
+              if (!events.includes(eName)) {
+                events.push(eName);
+              }
+            }
+          });
+        } catch (regError) {
+          console.warn('⚠️ Could not fetch registrations:', regError.message);
+        }
+        
+        console.log('✅ Final Events:', events);
+        console.log('✅ Final Workshops:', workshops);
+        console.log('✅ Events count:', events.length);
+        console.log('✅ Workshops count:', workshops.length);
         
         setProfileData({
           ...userData.data,
           registrationId: userData.data.participantId || userData.data._id,
           participantId: userData.data.participantId || null,
           qrCodeUrl: userData.data.qrCode || null,
-          events: regData.data?.map(reg => reg.event?.name || 'Unknown Event') || [],
+          events: events,
+          workshops: workshops,
           paymentStatus: userData.data.paymentStatus || 'pending',
           totalAmount: userData.data.paymentAmount || 0,
           registrationDate: userData.data.createdAt
         });
+        
+        console.log('🎯 Profile data set - Events:', events.length, 'Workshops:', workshops.length);
       } catch (error) {
-        console.error('Failed to fetch profile:', error);
+        console.error('❌ Failed to fetch profile:', error);
         // Fallback to basic user data
         setProfileData({
           ...user,
@@ -43,6 +96,7 @@ const Profile = () => {
           participantId: user?.participantId || null,
           qrCodeUrl: user?.qrCode || null,
           events: [],
+          workshops: [],
           paymentStatus: user?.paymentStatus || 'pending',
           totalAmount: user?.paymentAmount || 0,
           registrationDate: user?.createdAt || new Date()
@@ -57,23 +111,38 @@ const Profile = () => {
     }
   }, [user]);
 
-  const downloadQRCode = () => {
-    // If QR code URL exists from S3, download it directly
-    if (profileData?.qrCodeUrl) {
-      const link = document.createElement('a');
-      link.download = `SHACKLES2025-${profileData?.participantId || profileData?.name?.replace(/\s+/g, '_')}-QR.png`;
-      link.href = profileData.qrCodeUrl;
-      link.target = '_blank';
-      link.click();
-    } else {
-      // Fallback to canvas if no S3 URL (for unverified users)
-      const canvas = qrRef.current?.querySelector('canvas');
-      if (canvas) {
-        const url = canvas.toDataURL('image/png');
+  const downloadQRCode = async () => {
+    try {
+      // If QR code URL exists from S3, download it directly
+      if (profileData?.qrCodeUrl) {
+        const response = await fetch(profileData.qrCodeUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.download = `SHACKLES2025-${profileData?.name?.replace(/\s+/g, '_')}-QR.png`;
+        link.download = `SHACKLES2025-${profileData?.participantId || profileData?.name?.replace(/\s+/g, '_')}-QR.png`;
         link.href = url;
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else {
+        // Fallback to canvas if no S3 URL (for unverified users)
+        const canvas = qrRef.current?.querySelector('canvas');
+        if (canvas) {
+          const url = canvas.toDataURL('image/png');
+          const link = document.createElement('a');
+          link.download = `SHACKLES2025-${profileData?.name?.replace(/\s+/g, '_')}-QR.png`;
+          link.href = url;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to download QR code:', error);
+      // Fallback: open in new tab if download fails
+      if (profileData?.qrCodeUrl) {
+        window.open(profileData.qrCodeUrl, '_blank');
       }
     }
   };
@@ -245,11 +314,75 @@ const Profile = () => {
           {/* Events Registered */}
           {profileData?.events?.length > 0 && (
             <div className="events-section">
-              <h2 className="section-title">○ REGISTERED EVENTS</h2>
-              <div className="events-list">
+              <h2 className="section-title">REGISTERED EVENTS</h2>
+              <div style={{ 
+                display: 'flex', 
+                flexWrap: 'wrap', 
+                gap: '1rem', 
+                padding: '1.5rem',
+                backgroundColor: 'rgba(0, 0, 0, 0.3)'
+              }}>
                 {profileData.events.map((event, index) => (
-                  <div key={index} className="event-badge">
+                  <div 
+                    key={index}
+                    style={{
+                      padding: '1rem 2rem',
+                      background: 'linear-gradient(135deg, #00D7A1 0%, #00FFC8 100%)',
+                      border: '3px solid #00FFC8',
+                      borderRadius: '30px',
+                      color: '#000000',
+                      fontFamily: 'Rajdhani, sans-serif',
+                      fontWeight: 700,
+                      fontSize: '1.1rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '2px',
+                      display: 'block',
+                      minWidth: '250px',
+                      textAlign: 'center',
+                      boxShadow: '0 0 20px rgba(0, 215, 161, 0.5)',
+                      cursor: 'default'
+                    }}
+                  >
                     {typeof event === 'string' ? event : event?.name || 'Unknown Event'}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Workshops Registered */}
+          {profileData && profileData.workshops && profileData.workshops.length > 0 && (
+            <div className="workshops-section">
+              <h2 className="section-title">REGISTERED WORKSHOPS</h2>
+              <div style={{ 
+                display: 'flex', 
+                flexWrap: 'wrap', 
+                gap: '1rem', 
+                padding: '1.5rem',
+                backgroundColor: 'rgba(0, 0, 0, 0.3)'
+              }}>
+                {profileData.workshops.map((workshop, index) => (
+                  <div 
+                    key={index}
+                    style={{
+                      padding: '1rem 2rem',
+                      background: 'linear-gradient(135deg, #E31B6C 0%, #FF3385 100%)',
+                      border: '3px solid #FF3385',
+                      borderRadius: '30px',
+                      color: '#FFFFFF',
+                      fontFamily: 'Rajdhani, sans-serif',
+                      fontWeight: 700,
+                      fontSize: '1.1rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '2px',
+                      display: 'block',
+                      minWidth: '250px',
+                      textAlign: 'center',
+                      boxShadow: '0 0 20px rgba(227, 27, 108, 0.5)',
+                      cursor: 'default'
+                    }}
+                  >
+                    {typeof workshop === 'string' ? workshop : workshop?.title || workshop?.name || 'Unknown Workshop'}
                   </div>
                 ))}
               </div>

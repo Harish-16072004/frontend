@@ -155,8 +155,13 @@ exports.getMyRegistrations = async (req, res) => {
     }
 
     const registrations = await EventRegistration.find(filter)
-      .populate('event', 'name type venue date time registrationFee')
+      .populate('event', 'name category type venue date time registrationFee')
       .sort('-registeredAt');
+
+    console.log(`📋 Found ${registrations.length} registrations for user ${userId}`);
+    registrations.forEach((reg, i) => {
+      console.log(`  ${i + 1}. Event: ${reg.event?.name || 'N/A'} (Type: ${reg.eventType})`);
+    });
 
     res.status(200).json({
       success: true,

@@ -231,7 +231,6 @@
 
 /* === DETAILS SECTION === */
 .details-section,
-.events-section,
 .info-section {
   background: #000000;
   border: 2px solid #E31B6C;
@@ -287,6 +286,21 @@
 }
 
 /* === EVENTS SECTION === */
+.events-section {
+  background: #000000;
+  border: 2px solid #00D7A1;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 
+    0 0 30px rgba(0, 215, 161, 0.2),
+    inset 0 0 30px rgba(0, 215, 161, 0.05);
+}
+
+.events-section .section-title {
+  color: #00D7A1;
+  border-bottom-color: rgba(0, 215, 161, 0.3);
+}
+
 .events-list {
   display: flex;
   flex-wrap: wrap;
@@ -312,6 +326,34 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 20px rgba(0, 215, 161, 0.4);
   background: linear-gradient(135deg, rgba(0, 215, 161, 0.3), rgba(0, 215, 161, 0.2));
+}
+
+/* === WORKSHOPS SECTION === */
+.workshops-section {
+  background: #000000;
+  border: 2px solid #E31B6C;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 
+    0 0 30px rgba(227, 27, 108, 0.2),
+    inset 0 0 30px rgba(227, 27, 108, 0.05);
+}
+
+.workshops-section .section-title {
+  color: #E31B6C;
+  border-bottom-color: rgba(227, 27, 108, 0.3);
+}
+
+/* Workshop Badge Styling */
+.workshop-badge {
+  background: linear-gradient(135deg, rgba(227, 27, 108, 0.2), rgba(227, 27, 108, 0.1));
+  border: 2px solid #E31B6C;
+  color: #FF3385;
+}
+
+.workshop-badge:hover {
+  box-shadow: 0 4px 20px rgba(227, 27, 108, 0.4);
+  background: linear-gradient(135deg, rgba(227, 27, 108, 0.3), rgba(227, 27, 108, 0.2));
 }
 
 /* === INFO SECTION === */
@@ -404,6 +446,11 @@
     padding: 1rem 0.5rem;
   }
 
+  .profile-header {
+    margin-bottom: 2rem;
+    padding: 1.5rem 0;
+  }
+
   .profile-title {
     font-size: 2rem;
     letter-spacing: 2px;
@@ -415,27 +462,52 @@
 
   .qr-section {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .qr-card,
+  .status-card,
+  .details-section,
+  .events-section,
+  .workshops-section,
+  .info-section {
+    padding: 1.5rem;
   }
 
   .details-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .qr-wrapper {
     padding: 1rem;
   }
 
-  .qr-wrapper canvas {
-    width: 180px !important;
-    height: 180px !important;
+  .qr-wrapper canvas,
+  .qr-wrapper img {
+    width: 200px !important;
+    height: 200px !important;
   }
 
   .card-title {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
   }
 
   .section-title {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
+    letter-spacing: 1.5px;
+  }
+
+  .status-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .status-value,
+  .status-badge {
+    align-self: flex-end;
   }
 
   .profile-actions {
@@ -445,24 +517,129 @@
   .action-btn {
     width: 100%;
   }
+
+  .events-list {
+    gap: 0.75rem;
+  }
+
+  .event-badge {
+    font-size: 0.9rem;
+    padding: 0.65rem 1.2rem;
+  }
 }
 
 @media (max-width: 480px) {
-  .profile-title {
-    font-size: 1.5rem;
+  .profile-page {
+    padding: 0.75rem 0.25rem;
   }
 
-  .qr-wrapper canvas {
-    width: 150px !important;
-    height: 150px !important;
+  .profile-header {
+    margin-bottom: 1.5rem;
+    padding: 1rem 0;
+  }
+
+  .profile-title {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+  }
+
+  .profile-subtitle {
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+  }
+
+  .qr-card,
+  .status-card,
+  .details-section,
+  .events-section,
+  .workshops-section,
+  .info-section {
+    padding: 1rem;
+    border-width: 2px;
+  }
+
+  .qr-wrapper {
+    padding: 0.75rem;
+  }
+
+  .qr-wrapper canvas,
+  .qr-wrapper img {
+    width: 170px !important;
+    height: 170px !important;
   }
 
   .registration-id {
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+  }
+
+  .qr-instruction {
+    font-size: 0.9rem;
+  }
+
+  .download-qr-btn {
+    padding: 0.85rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .card-title {
+    font-size: 1.2rem;
+    letter-spacing: 1.5px;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+  }
+
+  .detail-item {
+    padding: 0.75rem;
+  }
+
+  .detail-label {
+    font-size: 0.8rem;
+  }
+
+  .detail-value {
     font-size: 1rem;
   }
 
   .event-badge {
+    font-size: 0.8rem;
+    padding: 0.55rem 1rem;
+    letter-spacing: 0.5px;
+  }
+
+  .info-list li {
+    font-size: 0.95rem;
+    padding: 0.6rem 0;
+  }
+
+  .action-btn {
+    padding: 0.85rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .status-item {
+    padding: 0.75rem;
+  }
+
+  .status-label {
+    font-size: 0.8rem;
+  }
+
+  .status-value {
+    font-size: 0.95rem;
+  }
+
+  .status-value.amount {
+    font-size: 1.3rem;
+  }
+
+  .status-badge {
+    padding: 0.4rem 0.8rem;
     font-size: 0.85rem;
-    padding: 0.6rem 1rem;
   }
 }

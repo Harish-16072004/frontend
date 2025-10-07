@@ -16,7 +16,19 @@ const decodeQRCode = (qrData) => {
   try {
     const data = JSON.parse(qrData);
     
-    // Validate required fields
+    // SECURITY: New format with minimal data
+    // t = token, p = participantId, v = version, e = event
+    if (data.t && data.p) {
+      return {
+        token: data.t,
+        participantId: data.p,
+        tokenVersion: data.v || 1,
+        eventName: data.e || 'SHACKLES2025'
+      };
+    }
+    
+    // LEGACY: Support old format (to be deprecated)
+    // Validate required fields for legacy format
     const requiredFields = ['participantId', 'name', 'email', 'registrationType'];
     const missingFields = requiredFields.filter(field => !data[field]);
     
@@ -28,10 +40,11 @@ const decodeQRCode = (qrData) => {
       participantId: data.participantId,
       name: data.name,
       email: data.email,
-      registrationType: data.registrationType, // 'general', 'workshop', 'both'
+      registrationType: data.registrationType,
       department: data.department || null,
       generatedAt: data.generatedAt || null,
-      eventName: data.eventName || 'SHACKLES 2025'
+      eventName: data.eventName || 'SHACKLES 2025',
+      legacy: true  // Flag for legacy QR codes
     };
   } catch (error) {
     throw new Error(`Failed to decode QR code: ${error.message}`);
@@ -41,13 +54,14 @@ const decodeQRCode = (qrData) => {
 /**
  * Validate participant exists and is verified
  * @param {String} participantId - The participant ID from QR code
+ * @param {String} token - The secure token from QR code (optional for legacy)
  * @returns {Object} - User data with verification status
  */
-const validateParticipant = async (participantId) => {
+const validateParticipant = async (participantId, token = null) => {
   try {
     // Find user by participant ID
     const user = await User.findOne({ participantId })
-      .select('participantId name email phone college department registrationType paymentStatus qrCode verifiedAt');
+      .select('participantId name email phone college department registrationType paymentStatus qrCode qrToken qrTokenExpiry qrTokenVersion lastQRScan qrScanCount verifiedAt');
     
     if (!user) {
       return {
@@ -55,6 +69,39 @@ const validateParticipant = async (participantId) => {
         error: 'INVALID_PARTICIPANT',
         message: 'Participant not found. Invalid QR code.'
       };
+    }
+    
+    // SECURITY: Validate token if provided (new dynamic QR system)
+    if (token) {
+      const tokenValidation = user.validateQRToken(token);
+      
+      if (!tokenValidation.valid) {
+        let errorMessage = '';
+        
+        if (tokenValidation.reason === 'INVALID_TOKEN') {
+          errorMessage = '🚫 Invalid QR code token. This QR may have been revoked or tampered with.';
+        } else if (tokenValidation.reason === 'TOKEN_EXPIRED') {
+          errorMessage = '⏰ QR code has expired. Please regenerate your QR code from your profile.';
+        } else {
+          errorMessage = '❌ QR code validation failed.';
+        }
+        
+        return {
+          valid: false,
+          error: tokenValidation.reason,
+          message: errorMessage,
+          participant: {
+            id: user.participantId
+          }
+        };
+      }
+      
+      // Update scan statistics
+      user.lastQRScan = Date.now();
+      user.qrScanCount = (user.qrScanCount || 0) + 1;
+      await user.save();
+      
+      console.log(`✅ Dynamic QR validated for ${participantId} (Scan #${user.qrScanCount})`);
     }
     
     // Check if payment is verified
@@ -81,7 +128,9 @@ const validateParticipant = async (participantId) => {
         college: user.college,
         department: user.department,
         registrationType: user.registrationType,
-        verifiedAt: user.verifiedAt
+        verifiedAt: user.verifiedAt,
+        scanCount: user.qrScanCount,
+        lastScan: user.lastQRScan
       }
     };
   } catch (error) {
@@ -221,8 +270,11 @@ const validateQRScan = async (qrData, eventId, eventType = 'event') => {
     // Step 1: Decode QR code
     const decodedData = decodeQRCode(qrData);
     
-    // Step 2: Validate participant
-    const participantValidation = await validateParticipant(decodedData.participantId);
+    // Step 2: Validate participant (with token if available)
+    const participantValidation = await validateParticipant(
+      decodedData.participantId,
+      decodedData.token  // Pass token for dynamic QR validation
+    );
     
     if (!participantValidation.valid) {
       return {
@@ -277,21 +329,30 @@ const validateQRScan = async (qrData, eventId, eventType = 'event') => {
       };
     }
     
-    // Step 5: Check specific event registration (optional - can be enabled/disabled)
-    // Uncomment below if you want to enforce specific event registration
-    /*
+    // Step 5: Check specific event registration (DYNAMIC CHECK)
+    // This ensures users can only check in to events they registered for
     const user = await User.findOne({ participantId: decodedData.participantId });
-    const registrationCheck = await checkEventRegistration(user._id, eventId, eventType);
+    const EventRegistration = require('../models/EventRegistration');
     
-    if (!registrationCheck.registered) {
+    const eventRegistration = await EventRegistration.findOne({
+      user: user._id,
+      event: eventId,
+      status: 'registered'
+    }).populate('event', 'name category');
+    
+    if (!eventRegistration) {
       return {
         success: false,
         step: 'EVENT_REGISTRATION',
+        error: 'NOT_REGISTERED_FOR_EVENT',
+        message: `❌ You are not registered for this ${eventType}.\n\nPlease register for this ${eventType === 'workshop' ? 'workshop' : 'event'} first from the events/workshops page.`,
         participant: participantValidation.participant,
-        ...registrationCheck
+        event: {
+          name: eventDetails.name,
+          category: eventCategory
+        }
       };
     }
-    */
     
     // All validations passed!
     return {
@@ -303,6 +364,11 @@ const validateQRScan = async (qrData, eventId, eventType = 'event') => {
         name: eventDetails.name,
         category: eventCategory,
         type: eventType
+      },
+      registration: {
+        id: eventRegistration._id,
+        registeredAt: eventRegistration.registeredAt,
+        eventType: eventRegistration.eventType
       },
       accessGranted: true
     };

@@ -1,0 +1,342 @@
+.event-registrations-page {
+  min-height: 100vh;
+  background: #000000;
+  padding: 2rem 1rem;
+}
+
+.registrations-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem 0;
+  border-bottom: 2px solid rgba(227, 27, 108, 0.3);
+}
+
+.page-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #E31B6C;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 20px rgba(227, 27, 108, 0.5);
+}
+
+.page-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.2rem;
+  color: #0AD7A1;
+  letter-spacing: 1px;
+}
+
+/* Filters */
+.filters-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: center;
+  padding: 2rem;
+  background: rgba(227, 27, 108, 0.05);
+  border: 1px solid rgba(227, 27, 108, 0.2);
+  border-radius: 12px;
+  margin-bottom: 3rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-group label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0AD7A1;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.filter-select,
+.filter-input {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(227, 27, 108, 0.3);
+  border-radius: 8px;
+  color: #ffffff;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.filter-select:focus,
+.filter-input:focus {
+  border-color: #E31B6C;
+  box-shadow: 0 0 10px rgba(227, 27, 108, 0.3);
+}
+
+.stats-summary {
+  display: flex;
+  gap: 2rem;
+  margin-left: auto;
+}
+
+.stat-item {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.1rem;
+  color: #ffffff;
+}
+
+.stat-item strong {
+  color: #E31B6C;
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+/* Events List */
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.event-registration-card {
+  background: linear-gradient(135deg, rgba(227, 27, 108, 0.05), rgba(10, 215, 161, 0.05));
+  border: 1px solid rgba(227, 27, 108, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.event-registration-card:hover {
+  border-color: #E31B6C;
+  box-shadow: 0 0 30px rgba(227, 27, 108, 0.3);
+}
+
+.event-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(227, 27, 108, 0.2);
+}
+
+.event-title-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.event-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+.event-type-tag {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.35rem 1rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.event-type-tag.technical {
+  background: rgba(52, 152, 219, 0.2);
+  border: 1px solid #3498db;
+  color: #3498db;
+}
+
+.event-type-tag.non-technical {
+  background: rgba(155, 89, 182, 0.2);
+  border: 1px solid #9b59b6;
+  color: #9b59b6;
+}
+
+.event-type-tag.workshop {
+  background: rgba(243, 156, 18, 0.2);
+  border: 1px solid #f39c12;
+  color: #f39c12;
+}
+
+.event-type-tag.special {
+  background: rgba(231, 76, 60, 0.2);
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+}
+
+.registration-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.count-badge {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #E31B6C;
+  line-height: 1;
+}
+
+.count-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.8rem;
+  color: #0AD7A1;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Table */
+.participants-table-wrapper {
+  overflow-x: auto;
+  padding: 2rem;
+}
+
+.participants-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.participants-table thead {
+  background: rgba(227, 27, 108, 0.1);
+}
+
+.participants-table th {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0AD7A1;
+  text-align: left;
+  padding: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid rgba(227, 27, 108, 0.3);
+}
+
+.participants-table td {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1rem;
+  color: #ffffff;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(227, 27, 108, 0.1);
+}
+
+.participants-table tbody tr {
+  transition: all 0.3s ease;
+}
+
+.participants-table tbody tr:hover {
+  background: rgba(227, 27, 108, 0.05);
+}
+
+.name-cell {
+  font-weight: 600;
+  color: #E31B6C;
+}
+
+.status-badge {
+  display: inline-block;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.registered {
+  background: rgba(46, 204, 113, 0.2);
+  border: 1px solid #2ecc71;
+  color: #2ecc71;
+}
+
+.status-badge.cancelled {
+  background: rgba(231, 76, 60, 0.2);
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+}
+
+.status-badge.attended {
+  background: rgba(52, 152, 219, 0.2);
+  border: 1px solid #3498db;
+  color: #3498db;
+}
+
+.no-data {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #ffffff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 1.2rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .page-title {
+    font-size: 2.5rem;
+  }
+
+  .event-title {
+    font-size: 1.5rem;
+  }
+
+  .participants-table-wrapper {
+    overflow-x: scroll;
+  }
+
+  .participants-table {
+    min-width: 800px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .filters-section {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .stats-summary {
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-left: 0;
+  }
+
+  .event-card-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .event-title-section {
+    flex-direction: column;
+  }
+
+  .participants-table th,
+  .participants-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+  }
+}

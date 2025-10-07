@@ -35,12 +35,32 @@ const AdminDashboard = () => {
       
       const users = usersResponse.data.users || [];
       
-      // Fetch events data
+      // Fetch all events
       const eventsResponse = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/v1/events`
       );
       
-      const events = eventsResponse.data.events || [];
+      // Fetch all workshops
+      const workshopsResponse = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/v1/workshops`
+      );
+      
+      // Fetch all event registrations
+      const registrationsResponse = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/v1/event-registrations/registrations/all`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      const events = eventsResponse.data.data || eventsResponse.data.events || [];
+      const workshops = workshopsResponse.data.data || workshopsResponse.data.workshops || [];
+      const allRegistrations = registrationsResponse.data.data || [];
+      
+      console.log('📊 Dashboard Data:', {
+        users: users.length,
+        events: events.length,
+        workshops: workshops.length,
+        registrations: allRegistrations.length
+      });
       
       // Calculate stats from real data
       const totalUsers = users.length;
@@ -67,11 +87,31 @@ const AdminDashboard = () => {
           status: user.paymentStatus
         }));
       
-      // Event-wise registrations (from events data)
-      const eventWiseRegistrations = events.map(event => ({
-        name: event.name,
-        count: event.registrations?.length || 0
-      })).slice(0, 6); // Top 6 events
+      // Event-wise registrations - count from EventRegistration collection
+      // Combine events and workshops
+      const allEventItems = [
+        ...events.map(e => ({ id: e._id, name: e.name, type: e.category || e.type || 'event' })),
+        ...workshops.map(w => ({ id: w._id, name: w.title, type: 'workshop' }))
+      ];
+      
+      // Count registrations for each event/workshop
+      const eventCounts = {};
+      allRegistrations.forEach(reg => {
+        const eventId = reg.event?._id || reg.event;
+        if (eventId) {
+          eventCounts[eventId] = (eventCounts[eventId] || 0) + 1;
+        }
+      });
+      
+      // Map counts to event names and sort by count
+      const eventWiseRegistrations = allEventItems
+        .map(item => ({
+          name: item.name,
+          type: item.type,
+          count: eventCounts[item.id] || 0
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10); // Top 10 events/workshops
       
       setStats({
         totalRegistrations: totalUsers,
@@ -186,6 +226,10 @@ const AdminDashboard = () => {
               <span className="action-icon">📅</span>
               <span className="action-label">Manage Events</span>
             </Link>
+            <Link to="/admin/registrations" className="action-card">
+              <span className="action-icon">📋</span>
+              <span className="action-label">View Registrations</span>
+            </Link>
             <Link to="/admin/payments" className="action-card">
               <span className="action-icon">💳</span>
               <span className="action-label">Verify Payments</span>
@@ -203,15 +247,23 @@ const AdminDashboard = () => {
 
         {/* Event-wise Registrations */}
         <div className="event-stats">
-          <h2 className="section-title">Event-wise Registrations</h2>
+          <h2 className="section-title">Event-wise Registrations (All Categories)</h2>
           <div className="events-chart">
             {stats.eventWiseRegistrations.map((event, index) => (
               <div key={index} className="event-bar">
-                <span className="event-name">{event.name}</span>
+                <div className="event-info">
+                  <span className="event-name">{event.name}</span>
+                  <span className={`event-type-badge ${event.type}`}>
+                    {event.type === 'workshop' ? '🛠️ Workshop' : 
+                     event.type === 'technical' ? '💻 Tech' :
+                     event.type === 'non-technical' ? '🎭 Non-Tech' :
+                     event.type === 'special' ? '⭐ Special' : '📅 Event'}
+                  </span>
+                </div>
                 <div className="bar-container">
                   <div 
                     className="bar-fill" 
-                    style={{ width: `${(event.count / 70) * 100}%` }}
+                    style={{ width: `${Math.min((event.count / 70) * 100, 100)}%` }}
                   >
                     <span className="bar-value">{event.count}</span>
                   </div>

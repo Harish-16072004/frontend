@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import api from '../services/api';
 import '../styles/Workshop.css';
@@ -104,18 +104,19 @@ const Workshop = () => {
 
   const fetchRegisteredWorkshops = async () => {
     try {
-      // Fetch both event registrations and workshop registrations
-      const { data } = await api.get('/event-registrations/my-registrations');
-      
-      // Filter for workshop category events and actual workshop registrations
+      // Fetch user's registrations (events & workshops)
+      const { data } = await api.get('/registrations/my-registrations');
+
+      // Collect workshop IDs from registration records
       const workshopIds = new Set();
-      
+
       data.data.forEach(reg => {
-        if (reg.event && reg.event._id) {
-          workshopIds.add(reg.event._id);
+        if (reg.type === 'workshop' && reg.workshop && reg.workshop._id) {
+          workshopIds.add(reg.workshop._id.toString());
         }
-        if (reg.workshop && reg.workshop._id) {
-          workshopIds.add(reg.workshop._id);
+        // Some previous code stored workshop under event when using generic eventRegistration collection
+        if (reg.event && reg.event.category === 'workshop' && reg.event._id) {
+          workshopIds.add(reg.event._id.toString());
         }
       });
       

@@ -15,8 +15,10 @@ import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import Profile from './pages/Auth/Profile';
 import ForgotPassword from './pages/Auth/ForgotPassword';
+import ResetPassword from './pages/Auth/ResetPassword';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import EventManagement from './pages/Admin/EventManagement';
+import EventRegistrations from './pages/Admin/EventRegistrations';
 import UserManagement from './pages/Admin/UserManagement';
 import PaymentVerification from './pages/Admin/PaymentVerification';
 import QRScannerPage from './pages/Admin/QRScannerPage';
@@ -45,6 +47,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password/:token" element={<ResetPassword />} />
               <Route path="/profile" element={
                 <PrivateRoute userOnly>
                   <Profile />
@@ -58,6 +61,11 @@ function App() {
               <Route path="/admin/events" element={
                 <PrivateRoute adminOnly>
                   <EventManagement />
+                </PrivateRoute>
+              } />
+              <Route path="/admin/registrations" element={
+                <PrivateRoute adminOnly>
+                  <EventRegistrations />
                 </PrivateRoute>
               } />
               <Route path="/admin/users" element={
